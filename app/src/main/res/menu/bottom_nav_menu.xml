@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:title="game scores"
+        android:icon="@drawable/games_stats_24"
+        android:id="@+id/game_scores"/>
+    <item
+        android:title="player stats"
+        android:icon="@drawable/teams_and_players_24"
+        android:id="@+id/player_stats"/>
+</menu>
