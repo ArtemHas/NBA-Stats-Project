@@ -3,6 +3,8 @@ package ru.samsung.nba_stats;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -16,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import javax.net.ssl.HttpsURLConnection;
 
@@ -160,7 +163,7 @@ public class GameScoresFragment extends Fragment{
         super.onViewCreated(view, savedInstanceState);
         get();
         try {
-            Thread.sleep(1500);
+            Thread.sleep(3000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -197,8 +200,8 @@ public class GameScoresFragment extends Fragment{
                 ArrayList<String> teamName2= new ArrayList<String>();
                 ArrayList<Integer> score1= new ArrayList<Integer>();
                 ArrayList<Integer> score2= new ArrayList<Integer>();
-                ArrayList<String> teamImage1= new ArrayList<String>();
-                ArrayList<String> teamImage2= new ArrayList<String>();
+                ArrayList<Bitmap> teamImage1= new ArrayList<Bitmap>();
+                ArrayList<Bitmap> teamImage2= new ArrayList<Bitmap>();
 
                 Thread get_data = new Thread(){
 
@@ -230,8 +233,18 @@ public class GameScoresFragment extends Fragment{
                                 teamName2.add(team_json_2.getString("displayName"));
                                 score1.add(team_json_1.getInt("score"));
                                 score2.add(team_json_2.getInt("score"));
-                                teamImage1.add(team_json_1.getString("logo"));
-                                teamImage2.add(team_json_2.getString("logo"));
+                                Bitmap bitmap1;
+                                Bitmap bitmap2;
+                                InputStream inputStream1 = null;
+                                InputStream inputStream2 = null;
+                                try{
+                                    inputStream1 = new java.net.URL(team_json_1.getString("logo")).openStream();
+                                    inputStream2 = new java.net.URL(team_json_2.getString("logo")).openStream();
+                                }catch (Exception e){};
+                                bitmap1 = BitmapFactory.decodeStream(inputStream1);
+                                bitmap2 = BitmapFactory.decodeStream(inputStream2);
+                                teamImage1.add(bitmap1);
+                                teamImage2.add(bitmap2);
                             } catch (JSONException ex) {
                                 throw new RuntimeException(ex);
                             }
@@ -239,6 +252,7 @@ public class GameScoresFragment extends Fragment{
                         for (int i = 0; i < teamName1.size(); i++){
                             Game game = new Game(teamImage1.get(i), teamImage2.get(i), teamName1.get(i), teamName2.get(i), score1.get(i), score2.get(i));
                             gamesArrayList.add(game);
+
                             Log.e("sys", teamName1.get(i) + " " + score1.get(i) + " - " + score2.get(i) + " " + teamName2.get(i));
                             Log.e("sys","----------------------------------------------------------------");
                         }

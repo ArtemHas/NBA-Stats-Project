@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,12 +45,15 @@ public class GameScoresAdapter extends RecyclerView.Adapter<GameScoresAdapter.My
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         Game game = gamesArrayList.get(position);
+
         /*new FetchImage(game.teamImage1, game.teamImage2, holder).start();*/
-        Log.e("sus", game.teamName1);
+
         holder.teamName1.setText(String.valueOf(game.teamName1));
         holder.teamName2.setText(String.valueOf(game.teamName2));
         holder.score1.setText(String.valueOf(game.score1));
         holder.score2.setText(String.valueOf(game.score2));
+        holder.teamImage1.setImageBitmap(game.teamImage1);
+        holder.teamImage2.setImageBitmap(game.teamImage2);
        /* holder.teamImage1.setImageResource(game.teamImage1);
         holder.teamName1.setText(game.teamName1);
         ЗДЕСЬ УЖЕ ГОТОВОЕ ВСЕ ЗАКИНУТЬ*/
@@ -74,7 +78,7 @@ public class GameScoresAdapter extends RecyclerView.Adapter<GameScoresAdapter.My
             score2 = itemView.findViewById(R.id.score2);
         }
     }
-    class FetchImage extends Thread{
+/*    class FetchImage extends Thread{
         String URL1;
         String URL2;
         GameScoresAdapter.MyViewHolder holder;
@@ -120,5 +124,5 @@ public class GameScoresAdapter extends RecyclerView.Adapter<GameScoresAdapter.My
             });
 
         }
-    }
+    }*/
 }
