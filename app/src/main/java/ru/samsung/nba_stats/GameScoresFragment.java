@@ -120,7 +120,7 @@ public class GameScoresFragment extends Fragment{
             gamesArrayList.clear();
             get();
             try {
-                Thread.sleep(10000);
+                Thread.sleep(7000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -180,7 +180,7 @@ public class GameScoresFragment extends Fragment{
         super.onViewCreated(view, savedInstanceState);
         get();
         try {
-            Thread.sleep(6000);
+            Thread.sleep(7000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
