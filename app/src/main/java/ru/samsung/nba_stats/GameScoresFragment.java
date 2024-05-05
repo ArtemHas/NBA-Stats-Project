@@ -1,6 +1,7 @@
 package ru.samsung.nba_stats;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -30,6 +31,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 
@@ -115,23 +117,22 @@ public class GameScoresFragment extends Fragment{
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if(requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK){
             selectedDate = data.getStringExtra("selectedDate");
-            Log.e("data", selectedDate);
             Button button = (Button) getView().findViewById(R.id.btnShowDatePicker);
             button.setText(selectedDate);
             gamesArrayList.clear();
             get();
             while (gamesArrayList.size() == 0 && noGames == false){
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }
+            TextView noGamesMessage = getActivity().findViewById(R.id.noGamesMessage);
+            recyclerView = getActivity().findViewById(R.id.recyclerview);
             if (noGames){
-                TextView noGamesMessage = getActivity().findViewById(R.id.noGamesMessage);
                 noGamesMessage.setText(R.string.no_games_message);
                 gamesArrayList.clear();
-                recyclerView = getActivity().findViewById(R.id.recyclerview);
                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                 Log.e("us", Integer.toString(gamesArrayList.size()));
                 GameScoresAdapter gameScoresAdapter = new GameScoresAdapter(getContext(), gamesArrayList);
@@ -140,7 +141,7 @@ public class GameScoresFragment extends Fragment{
                 gameScoresAdapter.notifyDataSetChanged();
                 noGames = false;
             }else{
-                recyclerView = getActivity().findViewById(R.id.recyclerview);
+                noGamesMessage.setText("");
                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                 Log.e("us", Integer.toString(gamesArrayList.size()));
                 GameScoresAdapter gameScoresAdapter = new GameScoresAdapter(getContext(), gamesArrayList);
@@ -201,11 +202,12 @@ public class GameScoresFragment extends Fragment{
 
         while (gamesArrayList.size() == 0 && noGames == false){
             try {
-                Thread.sleep(2000);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
+
         if (noGames){
             TextView noGamesMessage = view.findViewById(R.id.noGamesMessage);
             noGamesMessage.setText(R.string.no_games_today_message);
