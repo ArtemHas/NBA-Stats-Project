@@ -30,6 +30,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.TextView;
 
 
 import org.json.JSONArray;
@@ -62,6 +63,7 @@ import okhttp3.ResponseBody;
  */
 public class GameScoresFragment extends Fragment{
     EditText dateOfBirthET;
+    Boolean noGames = false;
     String selectedDate;
     Handler mainHandler = new Handler();
     public static final int REQUEST_CODE = 11;
@@ -87,10 +89,9 @@ public class GameScoresFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         client = new OkHttpClient();
-        /*Date c = Calendar.getInstance().getTime();
+        Date c = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        selectedDate = df.format(c);*/
-        selectedDate = "09/04/2024";
+        selectedDate = df.format(c);
         View view = inflater.inflate(R.layout.fragment_game_scores,container,false);
         Button btnShowDatePicker = (Button) view.findViewById(R.id.btnShowDatePicker);
         btnShowDatePicker.setText(selectedDate);
@@ -119,21 +120,25 @@ public class GameScoresFragment extends Fragment{
             button.setText(selectedDate);
             gamesArrayList.clear();
             get();
-            try {
-                Thread.sleep(7000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+            while (gamesArrayList.size() == 0 && noGames == false){
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
-            for (Game game : gamesArrayList) {
-                System.out.println(game);
+            if (noGames){
+                TextView noGamesMessage = getActivity().findViewById(R.id.noGamesMessage);
+                noGamesMessage.setText(R.string.no_games_message);
+                noGames = false;
+            }else{
+                recyclerView = getActivity().findViewById(R.id.recyclerview);
+                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                Log.e("us", Integer.toString(gamesArrayList.size()));
+                GameScoresAdapter gameScoresAdapter = new GameScoresAdapter(getContext(), gamesArrayList);
+                recyclerView.setAdapter(gameScoresAdapter);
+                gameScoresAdapter.notifyDataSetChanged();
             }
-            recyclerView = getActivity().findViewById(R.id.recyclerview);
-            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-            Log.e("us", Integer.toString(gamesArrayList.size()));
-            GameScoresAdapter gameScoresAdapter = new GameScoresAdapter(getContext(), gamesArrayList);
-            recyclerView.setAdapter(gameScoresAdapter);
-            gameScoresAdapter.notifyDataSetChanged();
-
             /*get();*/
             /*Runnable r = new Runnable() {
                 @Override
@@ -179,18 +184,31 @@ public class GameScoresFragment extends Fragment{
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         get();
-        try {
-            Thread.sleep(7000);
+        /*try {
+            Thread.sleep(4000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        }
+        }// while (gamesArrayList.size() == 0 && noGames == false)*/
 
-        recyclerView = view.findViewById(R.id.recyclerview);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        Log.e("us", Integer.toString(gamesArrayList.size()));
-        GameScoresAdapter gameScoresAdapter = new GameScoresAdapter(getContext(), gamesArrayList);
-        recyclerView.setAdapter(gameScoresAdapter);
-        gameScoresAdapter.notifyDataSetChanged();
+        while (gamesArrayList.size() == 0 && noGames == false){
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        if (noGames){
+            TextView noGamesMessage = view.findViewById(R.id.noGamesMessage);
+            noGamesMessage.setText(R.string.no_games_today_message);
+            noGames = false;
+        }else{
+            recyclerView = view.findViewById(R.id.recyclerview);
+            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            Log.e("us", Integer.toString(gamesArrayList.size()));
+            GameScoresAdapter gameScoresAdapter = new GameScoresAdapter(getContext(), gamesArrayList);
+            recyclerView.setAdapter(gameScoresAdapter);
+            gameScoresAdapter.notifyDataSetChanged();
+        }
     }
 
     public void get(){
@@ -200,13 +218,16 @@ public class GameScoresFragment extends Fragment{
             selectedDateFormatted += arrOfStr[i];
         }
         String newUrl = "https://www.espn.com/nba/scoreboard/_/data/" + selectedDateFormatted;
-        Log.e("data", newUrl);
+
+
         Request request = new Request.Builder().url(newUrl).build();
 
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
                 e.printStackTrace();
+
             }
 
             @Override
@@ -240,8 +261,11 @@ public class GameScoresFragment extends Fragment{
                                 throw new RuntimeException(e);
                             }
                         }
+                        if(games_json_obj.size() == 0){
+                            noGames = true;
+                        }
                         for (JSONObject jsonObject : games_json_obj) {
-                            try {;
+                            try {
                                 JSONArray competitors = jsonObject.getJSONArray("competitors");
                                 JSONObject team_json_1 = new JSONObject(competitors.get(0).toString());
                                 JSONObject team_json_2 = new JSONObject(competitors.get(1).toString());
@@ -273,9 +297,13 @@ public class GameScoresFragment extends Fragment{
                             Log.e("sys","----------------------------------------------------------------");
                         }
                     }
+
                 };
                 get_data.start();
             }
+
         });
+
     }
+
 }
