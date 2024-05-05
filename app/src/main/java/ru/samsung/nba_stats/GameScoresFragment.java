@@ -106,7 +106,7 @@ public class GameScoresFragment extends Fragment{
             }
         });
 
-        // Inflate the layout for this fragment
+
         return view;
     }
 
@@ -130,6 +130,14 @@ public class GameScoresFragment extends Fragment{
             if (noGames){
                 TextView noGamesMessage = getActivity().findViewById(R.id.noGamesMessage);
                 noGamesMessage.setText(R.string.no_games_message);
+                gamesArrayList.clear();
+                recyclerView = getActivity().findViewById(R.id.recyclerview);
+                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                Log.e("us", Integer.toString(gamesArrayList.size()));
+                GameScoresAdapter gameScoresAdapter = new GameScoresAdapter(getContext(), gamesArrayList);
+                recyclerView.setAdapter(gameScoresAdapter);
+                Log.e("item count in adapter", String.valueOf(gameScoresAdapter.getItemCount()));
+                gameScoresAdapter.notifyDataSetChanged();
                 noGames = false;
             }else{
                 recyclerView = getActivity().findViewById(R.id.recyclerview);
@@ -137,6 +145,7 @@ public class GameScoresFragment extends Fragment{
                 Log.e("us", Integer.toString(gamesArrayList.size()));
                 GameScoresAdapter gameScoresAdapter = new GameScoresAdapter(getContext(), gamesArrayList);
                 recyclerView.setAdapter(gameScoresAdapter);
+                Log.e("item count in adapter", String.valueOf(gameScoresAdapter.getItemCount()));
                 gameScoresAdapter.notifyDataSetChanged();
             }
             /*get();*/
@@ -208,6 +217,7 @@ public class GameScoresFragment extends Fragment{
             GameScoresAdapter gameScoresAdapter = new GameScoresAdapter(getContext(), gamesArrayList);
             recyclerView.setAdapter(gameScoresAdapter);
             gameScoresAdapter.notifyDataSetChanged();
+            Log.e("item count in adapter", String.valueOf(gameScoresAdapter.getItemCount()));
         }
     }
 
