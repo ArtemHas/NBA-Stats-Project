@@ -1,7 +1,7 @@
 package ru.samsung.nba_stats;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
+
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -9,6 +9,10 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,8 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import javax.net.ssl.HttpsURLConnection;
+
 
 import android.os.Handler;
 import android.util.Log;
@@ -29,9 +32,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
+
 import android.widget.EditText;
-import android.widget.ProgressBar;
+
 import android.widget.TextView;
 
 
@@ -39,30 +42,25 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
 import java.util.Date;
 import java.util.Locale;
-import java.util.Scanner;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.HttpUrl;
+
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link GameScoresFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class GameScoresFragment extends Fragment{
     EditText dateOfBirthET;
     Boolean noGames = false;
@@ -104,7 +102,6 @@ public class GameScoresFragment extends Fragment{
                 AppCompatDialogFragment newFragment = new DatePickerFragment();
                 newFragment.setTargetFragment(GameScoresFragment.this,REQUEST_CODE);
                 newFragment.show(fm,"datePicker");
-
             }
         });
 
@@ -113,7 +110,7 @@ public class GameScoresFragment extends Fragment{
     }
 
 
-    @Override
+   @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if(requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK){
             selectedDate = data.getStringExtra("selectedDate");
@@ -149,20 +146,6 @@ public class GameScoresFragment extends Fragment{
                 Log.e("item count in adapter", String.valueOf(gameScoresAdapter.getItemCount()));
                 gameScoresAdapter.notifyDataSetChanged();
             }
-            /*get();*/
-            /*Runnable r = new Runnable() {
-                @Override
-                public void run(){
-                    recyclerView = getView().findViewById(R.id.recyclerview);
-                    recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                    recyclerView.setHasFixedSize(true);
-                    GameScoresAdapter gameScoresAdapter = new GameScoresAdapter(getContext(), gamesArrayList);
-                    recyclerView.setAdapter(gameScoresAdapter);
-                    gameScoresAdapter.notifyDataSetChanged();
-                }
-            };
-            Handler h = new Handler();
-            h.postDelayed(r, 2000);*/
         }
     }
 
@@ -252,66 +235,57 @@ public class GameScoresFragment extends Fragment{
                 ArrayList<Bitmap> teamImage1= new ArrayList<Bitmap>();
                 ArrayList<Bitmap> teamImage2= new ArrayList<Bitmap>();
 
-                Thread get_data = new Thread(){
-
-                    @Override
-                    public void run() {
-
-                        String sb;
-                        try {
-                            sb = response.body().string();
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                        Pattern pattern = Pattern.compile("\\{\"id\":\"\\w+\",\"competitors\":\\[\\{\"id\":\"\\w+\",\"abbrev\":\"\\w+\",\"displayName\":\"[\\w\\s]+\",\"shortDisplayName\":\"[\\w\\s-]+\",\"logo\":\"[\\w/\\-.:]+\",\"teamColor\":\"\\w+\",\"altColor\":\"\\w+\",\"uid\":\"[\\w:~]+\",\"recordSummary\":\"\\w*+\",\"standingSummary\":\"\\w*+\",\"location\":\"[\\w\\s]+\",\"links\":\"[\\w/_.\\-]+\",\"isHome\":\\w+,\"score\":\\w+,[\"winner\":true,]*\"records\":\\[\\{\"name\":\"overall\",\"abbreviation\":\"\\w+\",\"type\":\"\\w+\",\"summary\":\"[\\w\\-]+\"\\},\\{\"name\":\"Home\",\"type\":\"home\",\"summary\":\"[\\w\\-]+\"\\}]\\},\\{\"id\":\"\\w+\",\"abbrev\":\"\\w+\",\"displayName\":\"[\\w\\s]+\",\"shortDisplayName\":\"[\\w\\s-]+\",\"logo\":\"[\\w/\\-.:]+\",\"teamColor\":\"\\w+\",\"altColor\":\"\\w+\",\"uid\":\"[\\w/.:~]+\",\"recordSummary\":\"\\w*+\",\"standingSummary\":\"\\w*+\",\"location\":\"[\\w\\s]+\",\"links\":\"[\\w/\\-]+\",\"isHome\":\\w+,\"score\":\\w+,[\"winner\":true,]*\"records\":\\[\\{\"name\":\"overall\",\"abbreviation\":\"\\w+\",\"type\":\"\\w+\",\"summary\":\"[\\w\\-]+\"\\},\\{\"name\":\"Road\",\"type\":\"road\",\"summary\":\"[\\w\\-]+\"\\}]\\}],\"date\":\"[\\w\\-:]+\"");
-                        Matcher matcher = pattern.matcher(sb);
-                        ArrayList<JSONObject> games_json_obj = new ArrayList<JSONObject>();
-                        while (matcher.find()){
-                            try {
-                                games_json_obj.add(new JSONObject(sb.substring(matcher.start(), matcher.end()).concat("}")));
-                            } catch (JSONException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                        if(games_json_obj.size() == 0){
-                            noGames = true;
-                        }
-                        for (JSONObject jsonObject : games_json_obj) {
-                            try {
-                                JSONArray competitors = jsonObject.getJSONArray("competitors");
-                                JSONObject team_json_1 = new JSONObject(competitors.get(0).toString());
-                                JSONObject team_json_2 = new JSONObject(competitors.get(1).toString());
-                                teamName1.add(team_json_1.getString("displayName"));
-                                teamName2.add(team_json_2.getString("displayName"));
-                                score1.add(team_json_1.getInt("score"));
-                                score2.add(team_json_2.getInt("score"));
-                                Bitmap bitmap1;
-                                Bitmap bitmap2;
-                                InputStream inputStream1 = null;
-                                InputStream inputStream2 = null;
-                                try{
-                                    inputStream1 = new java.net.URL(team_json_1.getString("logo")).openStream();
-                                    inputStream2 = new java.net.URL(team_json_2.getString("logo")).openStream();
-                                }catch (Exception e){};
-                                bitmap1 = BitmapFactory.decodeStream(inputStream1);
-                                bitmap2 = BitmapFactory.decodeStream(inputStream2);
-                                teamImage1.add(bitmap1);
-                                teamImage2.add(bitmap2);
-                            } catch (JSONException ex) {
-                                throw new RuntimeException(ex);
-                            }
-                        }
-                        for (int i = 0; i < teamName1.size(); i++){
-                            Game game = new Game(teamImage1.get(i), teamImage2.get(i), teamName1.get(i), teamName2.get(i), score1.get(i), score2.get(i));
-                            gamesArrayList.add(game);
-
-                            Log.e("sys", teamName1.get(i) + " " + score1.get(i) + " - " + score2.get(i) + " " + teamName2.get(i));
-                            Log.e("sys","----------------------------------------------------------------");
-                        }
+                String sb;
+                try {
+                    sb = response.body().string();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                Pattern pattern = Pattern.compile("\\{\"id\":\"\\w+\",\"competitors\":\\[\\{\"id\":\"\\w+\",\"abbrev\":\"\\w+\",\"displayName\":\"[\\w\\s]+\",\"shortDisplayName\":\"[\\w\\s-]+\",\"logo\":\"[\\w/\\-.:]+\",\"teamColor\":\"\\w+\",\"altColor\":\"\\w+\",\"uid\":\"[\\w:~]+\",\"recordSummary\":\"\\w*+\",\"standingSummary\":\"\\w*+\",\"location\":\"[\\w\\s]+\",\"links\":\"[\\w/_.\\-]+\",\"isHome\":\\w+,\"score\":\\w+,[\"winner\":true,]*\"records\":\\[\\{\"name\":\"overall\",\"abbreviation\":\"\\w+\",\"type\":\"\\w+\",\"summary\":\"[\\w\\-]+\"\\},\\{\"name\":\"Home\",\"type\":\"home\",\"summary\":\"[\\w\\-]+\"\\}]\\},\\{\"id\":\"\\w+\",\"abbrev\":\"\\w+\",\"displayName\":\"[\\w\\s]+\",\"shortDisplayName\":\"[\\w\\s-]+\",\"logo\":\"[\\w/\\-.:]+\",\"teamColor\":\"\\w+\",\"altColor\":\"\\w+\",\"uid\":\"[\\w/.:~]+\",\"recordSummary\":\"\\w*+\",\"standingSummary\":\"\\w*+\",\"location\":\"[\\w\\s]+\",\"links\":\"[\\w/\\-]+\",\"isHome\":\\w+,\"score\":\\w+,[\"winner\":true,]*\"records\":\\[\\{\"name\":\"overall\",\"abbreviation\":\"\\w+\",\"type\":\"\\w+\",\"summary\":\"[\\w\\-]+\"\\},\\{\"name\":\"Road\",\"type\":\"road\",\"summary\":\"[\\w\\-]+\"\\}]\\}],\"date\":\"[\\w\\-:]+\"");
+                Matcher matcher = pattern.matcher(sb);
+                ArrayList<JSONObject> games_json_obj = new ArrayList<JSONObject>();
+                while (matcher.find()){
+                    try {
+                        games_json_obj.add(new JSONObject(sb.substring(matcher.start(), matcher.end()).concat("}")));
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
                     }
+                }
+                if(games_json_obj.size() == 0){
+                    noGames = true;
+                }
+                for (JSONObject jsonObject : games_json_obj) {
+                    try {
+                        JSONArray competitors = jsonObject.getJSONArray("competitors");
+                        JSONObject team_json_1 = new JSONObject(competitors.get(0).toString());
+                        JSONObject team_json_2 = new JSONObject(competitors.get(1).toString());
+                        teamName1.add(team_json_1.getString("displayName"));
+                        teamName2.add(team_json_2.getString("displayName"));
+                        score1.add(team_json_1.getInt("score"));
+                        score2.add(team_json_2.getInt("score"));
+                        Bitmap bitmap1;
+                        Bitmap bitmap2;
+                        InputStream inputStream1 = null;
+                        InputStream inputStream2 = null;
+                        try{
+                            inputStream1 = new java.net.URL(team_json_1.getString("logo")).openStream();
+                            inputStream2 = new java.net.URL(team_json_2.getString("logo")).openStream();
+                        }catch (Exception e){};
+                        bitmap1 = BitmapFactory.decodeStream(inputStream1);
+                        bitmap2 = BitmapFactory.decodeStream(inputStream2);
+                        teamImage1.add(bitmap1);
+                        teamImage2.add(bitmap2);
+                    } catch (JSONException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+                for (int i = 0; i < teamName1.size(); i++){
+                    Game game = new Game(teamImage1.get(i), teamImage2.get(i), teamName1.get(i), teamName2.get(i), score1.get(i), score2.get(i));
+                    gamesArrayList.add(game);
+                    Log.e("sys", teamName1.get(i) + " " + score1.get(i) + " - " + score2.get(i) + " " + teamName2.get(i));
+                    Log.e("sys","----------------------------------------------------------------");
+                }
 
-                };
-                get_data.start();
             }
 
         });
