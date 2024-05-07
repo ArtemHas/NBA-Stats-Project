@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "237667136739",
+    "firebase_url": "https://nba-stats-base-default-rtdb.firebaseio.com",
+    "project_id": "nba-stats-base",
+    "storage_bucket": "nba-stats-base.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:237667136739:android:975dcbce9f06593ffa81d6",
+        "android_client_info": {
+          "package_name": "ru.samsung.nba_stats"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBFGpi7z31YOBNqQaE_-OnaI_rZwpQhsjQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:237667136739:android:65013adde936c5adfa81d6",
+        "android_client_info": {
+          "package_name": "ru.samsung.nothing"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBFGpi7z31YOBNqQaE_-OnaI_rZwpQhsjQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

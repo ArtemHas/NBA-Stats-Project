@@ -38,6 +38,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -68,6 +71,10 @@ public class GameScoresFragment extends Fragment{
     Handler mainHandler = new Handler();
     public static final int REQUEST_CODE = 11;
     ArrayList<Game> gamesArrayList = new ArrayList<>();
+    ArrayList<GameForDB> gamesForDBArrayList = new ArrayList<>();
+
+    FirebaseDatabase db;
+    DatabaseReference reference;
     private OnFragmentInteractionListener mListener;
     private RecyclerView recyclerView;
     OkHttpClient client;
@@ -213,7 +220,6 @@ public class GameScoresFragment extends Fragment{
             selectedDateFormatted += arrOfStr[i];
         }
         String newUrl = "https://www.espn.com/nba/scoreboard/_/data/" + selectedDateFormatted;
-
 
         Request request = new Request.Builder().url(newUrl).build();
 
