@@ -19,6 +19,7 @@ public class PlayerStatsFragment extends Fragment {
 
     }
     public static PlayerStatsFragment newInstance() {
+
         PlayerStatsFragment fragment = new PlayerStatsFragment();
         return fragment;
     }
@@ -29,6 +30,8 @@ public class PlayerStatsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_player_stats, container, false);
+        LoadingDialog ld = new LoadingDialog(getActivity());
+        ld.startLoadingAnimation();
 
         return view;
     }
