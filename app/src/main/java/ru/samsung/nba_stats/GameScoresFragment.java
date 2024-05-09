@@ -59,6 +59,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import java.util.Scanner;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -110,9 +111,10 @@ public class GameScoresFragment extends Fragment {
         client = new OkHttpClient();
         Date c = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        df.setTimeZone(TimeZone.getTimeZone("GMT-04:00"));
         selectedDate = df.format(c);
         todayDate = selectedDate;
-
+        Log.e("sys", "---------------" + todayDate);
         String[] arrOfStr = todayDate.split("/");
         for (int i = arrOfStr.length - 1; i > -1; i--) {
             todayDateFormatted += arrOfStr[i];
