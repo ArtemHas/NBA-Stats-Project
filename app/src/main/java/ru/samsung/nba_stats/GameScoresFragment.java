@@ -158,7 +158,7 @@ public class GameScoresFragment extends Fragment {
             ArrayList<String> teamLogo1 = new ArrayList<>();
             ArrayList<String> teamLogo2 = new ArrayList<>();
 
-            recyclerView = getActivity().findViewById(R.id.recyclerview);
+            recyclerView = getActivity().findViewById(R.id.gameScoresRecyclerView);
             recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
             GameScoresAdapter gameScoresAdapter = new GameScoresAdapter(getContext(), gamesArrayList);
             recyclerView.setAdapter(gameScoresAdapter);
@@ -428,7 +428,7 @@ public class GameScoresFragment extends Fragment {
         ArrayList<String> teamLogo1 = new ArrayList<>();
         ArrayList<String> teamLogo2 = new ArrayList<>();
 
-        recyclerView = view.findViewById(R.id.recyclerview);
+        recyclerView = view.findViewById(R.id.gameScoresRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         GameScoresAdapter gameScoresAdapter = new GameScoresAdapter(getContext(), gamesArrayList);
         recyclerView.setAdapter(gameScoresAdapter);

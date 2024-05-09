@@ -24,7 +24,7 @@
             android:gravity="center"
             android:textSize="30dp"
             app:layout_constraintTop_toBottomOf="@+id/btnShowDatePicker"
-            app:layout_constraintBottom_toTopOf="@id/recyclerview"
+            app:layout_constraintBottom_toTopOf="@id/gameScoresRecyclerView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>
 
@@ -39,10 +39,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/recyclerview"/>
+            app:layout_constraintBottom_toTopOf="@+id/gameScoresRecyclerView"/>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerview"
+            android:id="@+id/gameScoresRecyclerView"
             android:layout_width="match_parent"
             app:layout_constrainedHeight="true"
             android:layout_height="match_parent"
