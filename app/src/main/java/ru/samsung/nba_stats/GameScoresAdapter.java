@@ -1,12 +1,6 @@
 package ru.samsung.nba_stats;
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.Handler;
-import android.os.PowerManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,14 +11,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.imageview.ShapeableImageView;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 
 public class GameScoresAdapter extends RecyclerView.Adapter<GameScoresAdapter.MyViewHolder>{
     Context context;
-    Handler mainHandler = new Handler();
-    ProgressDialog progressDialog;
+
     ArrayList<Game> gamesArrayList;
     public GameScoresAdapter(Context context, ArrayList<Game> gamesArrayList) {
 

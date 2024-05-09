@@ -1,9 +1,6 @@
 package ru.samsung.nba_stats;
 
 import android.graphics.Bitmap;
-import android.widget.TextView;
-
-import com.google.android.material.imageview.ShapeableImageView;
 
 public class Game {
     public Game(Bitmap teamImage1, Bitmap teamImage2, String teamName1, String teamName2, Integer score1, Integer score2) {

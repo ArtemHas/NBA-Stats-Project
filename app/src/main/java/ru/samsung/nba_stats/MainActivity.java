@@ -4,6 +4,7 @@ package ru.samsung.nba_stats;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -17,15 +18,14 @@ import ru.samsung.nba_stats.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity  implements GameScoresFragment.OnFragmentInteractionListener{
     private ActivityMainBinding binding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         replaceFragment(new GameScoresFragment());
-
         String game_scores_id = String.valueOf(R.id.game_scores);
         String player_stats_id = String.valueOf(R.id.player_stats);
 

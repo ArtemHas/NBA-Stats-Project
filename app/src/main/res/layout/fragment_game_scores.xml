@@ -10,7 +10,8 @@
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent"
     android:background="@color/white"
-    tools:context=".GameScoresFragment">
+    tools:context=".GameScoresFragment"
+    android:id="@+id/fragment_game_scores">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

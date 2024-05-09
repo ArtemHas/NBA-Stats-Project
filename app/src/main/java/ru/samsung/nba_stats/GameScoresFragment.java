@@ -102,24 +102,26 @@ public class GameScoresFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        db = FirebaseDatabase.getInstance();
-        client = new OkHttpClient();
         Date c = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         df.setTimeZone(TimeZone.getTimeZone("GMT-04:00"));
         selectedDate = df.format(c);
+
+        Log.e("selectedDate", selectedDate);
+        db = FirebaseDatabase.getInstance();
+        client = new OkHttpClient();
         todayDate = selectedDate;
-        Log.e("sys", "---------------" + todayDate);
         String[] arrOfStr = todayDate.split("/");
         for (int i = arrOfStr.length - 1; i > -1; i--) {
             todayDateFormatted += arrOfStr[i];
         }
-
 
         View view = inflater.inflate(R.layout.fragment_game_scores, container, false);
         Button btnShowDatePicker = (Button) view.findViewById(R.id.btnShowDatePicker);
@@ -137,7 +139,6 @@ public class GameScoresFragment extends Fragment {
 
         return view;
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -192,10 +193,8 @@ public class GameScoresFragment extends Fragment {
                                         reference.addValueEventListener(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                Log.e("sys", snapshot.getValue().toString());
                                                 if (snapshot.getValue().toString().equals("none")) {
                                                     noGames = true;
-                                                    Log.e("sys", "zaebis");
                                                 } else {
                                                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                                         GameForDB gameForDB = dataSnapshot.getValue(GameForDB.class);
@@ -215,8 +214,6 @@ public class GameScoresFragment extends Fragment {
                                                                     inputStream2 = new URL(gameForDB.teamImage2).openStream();
                                                                     bitmap1 = BitmapFactory.decodeStream(inputStream1);
                                                                     bitmap2 = BitmapFactory.decodeStream(inputStream2);
-                                                                    Log.e("bitmap", String.valueOf(bitmap1));
-                                                                    Log.e("bitmap", String.valueOf(bitmap2));
                                                                     teamImage1.add(bitmap1);
                                                                     teamImage2.add(bitmap2);
                                                                 } catch (Exception e) {
@@ -234,8 +231,6 @@ public class GameScoresFragment extends Fragment {
                                                     }
                                                     for (int i = 0; i < teamName1.size(); i++) {
                                                         Game game = new Game(teamImage1.get(i), teamImage2.get(i), teamName1.get(i), teamName2.get(i), score1.get(i), score2.get(i));
-                                                        Log.e("sys", game.teamName1 + " " + game.score1 + " " + game.score2 + " " + game.teamName2);
-                                                        Log.e("this", String.valueOf(teamImage1.get(i)));
                                                         gamesArrayList.add(game);
                                                     }
                                                 }
@@ -259,6 +254,7 @@ public class GameScoresFragment extends Fragment {
                                         Thread get_data = new Thread(new Runnable() {
                                             @Override
                                             public void run() {
+                                                Log.e("sys", "getting from url");
                                                 String newUrl = "https://www.espn.com/nba/scoreboard/_/data/" + finalSelectedDateFormatted;
                                                 try {
                                                     URL urlObj = new URL(newUrl);
@@ -318,7 +314,6 @@ public class GameScoresFragment extends Fragment {
                                                         for (int i = 0; i < teamName1.size(); i++) {
                                                             Game game = new Game(teamImage1.get(i), teamImage2.get(i), teamName1.get(i), teamName2.get(i), score1.get(i), score2.get(i));
                                                             GameForDB gameForDB = new GameForDB(teamLogo1.get(i), teamLogo2.get(i), teamName1.get(i), teamName2.get(i), score1.get(i), score2.get(i));
-                                                            Log.e("sys", teamName1.get(i) + " " + score1.get(i) + " " + score2.get(i) + " " + teamName2.get(i));
                                                             gamesArrayList.add(game);
                                                             gamesForDBArrayList.add(gameForDB);
                                                         }
@@ -340,12 +335,7 @@ public class GameScoresFragment extends Fragment {
                                         DateTimeFormatter f = DateTimeFormatter.ofPattern("dd/MM/uuuu");
                                         LocalDate selected = LocalDate.parse(selectedDate, f);
                                         LocalDate today = LocalDate.parse(todayDate, f);
-                                        Log.e("dat", finalSelectedDateFormatted);
-                                        Log.e("dat", todayDateFormatted);
-                                        Log.e("dat", String.valueOf(selected.isBefore(today)));
-                                        Log.e("No games", String.valueOf(noGames));
                                         if (noGames && selected.isBefore(today)) {
-                                            Log.e("from no games", "from no games");
                                             noGamesMessage.setText(R.string.no_games_message);
                                             reference.child(finalSelectedDateFormatted).setValue("none").addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
@@ -417,6 +407,7 @@ public class GameScoresFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         LoadingDialog ld = new LoadingDialog(getActivity());
         ld.startLoadingAnimation();
         ArrayList<String> teamName1 = new ArrayList<String>();
@@ -427,7 +418,6 @@ public class GameScoresFragment extends Fragment {
         ArrayList<Bitmap> teamImage2 = new ArrayList<Bitmap>();
         ArrayList<String> teamLogo1 = new ArrayList<>();
         ArrayList<String> teamLogo2 = new ArrayList<>();
-
         recyclerView = view.findViewById(R.id.gameScoresRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         GameScoresAdapter gameScoresAdapter = new GameScoresAdapter(getContext(), gamesArrayList);
@@ -513,7 +503,6 @@ public class GameScoresFragment extends Fragment {
                                         for (int i = 0; i < teamName1.size(); i++) {
                                             Game game = new Game(teamImage1.get(i), teamImage2.get(i), teamName1.get(i), teamName2.get(i), score1.get(i), score2.get(i));
                                             GameForDB gameForDB = new GameForDB(teamLogo1.get(i), teamLogo2.get(i), teamName1.get(i), teamName2.get(i), score1.get(i), score2.get(i));
-                                            Log.e("sys", teamName1.get(i) + " " + score1.get(i) + " " + score2.get(i) + " " + teamName2.get(i));
                                             gamesArrayList.add(game);
                                             gamesForDBArrayList.add(gameForDB);
                                         }
@@ -545,365 +534,6 @@ public class GameScoresFragment extends Fragment {
         }).start();
 
 
-        /*try {
-            Thread.sleep(4000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }// while (gamesArrayList.size() == 0 && noGames == false)*/
-
-
-        /*if (noGames){
-            TextView noGamesMessage = view.findViewById(R.id.noGamesMessage);
-            noGamesMessage.setText(R.string.no_games_today_message);
-            noGames = false;
-        }else{
-
-            gameScoresAdapter.notifyDataSetChanged();
-            Log.e("item count in adapter", String.valueOf(gameScoresAdapter.getItemCount()));
-        }*/
-    }
-
-    public void getFromURL(boolean isToday) {
-        ArrayList<String> teamName1 = new ArrayList<String>();
-        ArrayList<String> teamName2 = new ArrayList<String>();
-        ArrayList<Integer> score1 = new ArrayList<Integer>();
-        ArrayList<Integer> score2 = new ArrayList<Integer>();
-        ArrayList<Bitmap> teamImage1 = new ArrayList<Bitmap>();
-        ArrayList<Bitmap> teamImage2 = new ArrayList<Bitmap>();
-        ArrayList<String> teamLogo1 = new ArrayList<>();
-        ArrayList<String> teamLogo2 = new ArrayList<>();
-
-        String newUrl = "https://www.espn.com/nba/scoreboard/_/data/" + finalSelectedDateFormatted;
-
-        Request request = new Request.Builder().url(newUrl).build();
-
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-
-                e.printStackTrace();
-
-            }
-
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-
-                String sb;
-                try {
-                    sb = response.body().string();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                Pattern pattern = Pattern.compile("\\{\"id\":\"\\w+\",\"competitors\":\\[\\{\"id\":\"\\w+\",\"abbrev\":\"\\w+\",\"displayName\":\"[\\w\\s]+\",\"shortDisplayName\":\"[\\w\\s-]+\",\"logo\":\"[\\w/\\-.:]+\",\"teamColor\":\"\\w+\",\"altColor\":\"\\w+\",\"uid\":\"[\\w:~]+\",\"recordSummary\":\"\\w*+\",\"standingSummary\":\"\\w*+\",\"location\":\"[\\w\\s]+\",\"links\":\"[\\w/_.\\-]+\",\"isHome\":\\w+,\"score\":\\w+,[\"winner\":true,]*\"records\":\\[\\{\"name\":\"overall\",\"abbreviation\":\"\\w+\",\"type\":\"\\w+\",\"summary\":\"[\\w\\-]+\"\\},\\{\"name\":\"Home\",\"type\":\"home\",\"summary\":\"[\\w\\-]+\"\\}]\\},\\{\"id\":\"\\w+\",\"abbrev\":\"\\w+\",\"displayName\":\"[\\w\\s]+\",\"shortDisplayName\":\"[\\w\\s-]+\",\"logo\":\"[\\w/\\-.:]+\",\"teamColor\":\"\\w+\",\"altColor\":\"\\w+\",\"uid\":\"[\\w/.:~]+\",\"recordSummary\":\"\\w*+\",\"standingSummary\":\"\\w*+\",\"location\":\"[\\w\\s]+\",\"links\":\"[\\w/\\-]+\",\"isHome\":\\w+,\"score\":\\w+,[\"winner\":true,]*\"records\":\\[\\{\"name\":\"overall\",\"abbreviation\":\"\\w+\",\"type\":\"\\w+\",\"summary\":\"[\\w\\-]+\"\\},\\{\"name\":\"Road\",\"type\":\"road\",\"summary\":\"[\\w\\-]+\"\\}]\\}],\"date\":\"[\\w\\-:]+\"");
-                Matcher matcher = pattern.matcher(sb);
-                ArrayList<JSONObject> games_json_obj = new ArrayList<JSONObject>();
-                while (matcher.find()) {
-                    try {
-                        games_json_obj.add(new JSONObject(sb.substring(matcher.start(), matcher.end()).concat("}")));
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                if (games_json_obj.size() == 0) {
-                    noGames = true;
-                    Log.e("NOGAMES", String.valueOf(noGames));
-                    reference.child(finalSelectedDateFormatted).setValue("none").addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            Log.e("sys", "written successfully");
-                        }
-                    });
-                } else {
-                    for (JSONObject jsonObject : games_json_obj) {
-                        try {
-                            JSONArray competitors = jsonObject.getJSONArray("competitors");
-                            JSONObject team_json_1 = new JSONObject(competitors.get(0).toString());
-                            JSONObject team_json_2 = new JSONObject(competitors.get(1).toString());
-                            teamName1.add(team_json_1.getString("displayName"));
-                            teamName2.add(team_json_2.getString("displayName"));
-                            score1.add(team_json_1.getInt("score"));
-                            score2.add(team_json_2.getInt("score"));
-                            teamLogo1.add(team_json_1.getString("logo"));
-                            teamLogo2.add(team_json_2.getString("logo"));
-                            Bitmap bitmap1;
-                            Bitmap bitmap2;
-                            InputStream inputStream1 = null;
-                            InputStream inputStream2 = null;
-                            try {
-                                inputStream1 = new java.net.URL(team_json_1.getString("logo")).openStream();
-                                inputStream2 = new java.net.URL(team_json_2.getString("logo")).openStream();
-                            } catch (Exception e) {
-                            }
-
-                            bitmap1 = BitmapFactory.decodeStream(inputStream1);
-                            bitmap2 = BitmapFactory.decodeStream(inputStream2);
-                            teamImage1.add(bitmap1);
-                            teamImage2.add(bitmap2);
-                        } catch (JSONException ex) {
-                            throw new RuntimeException(ex);
-                        }
-                    }
-                    if (isToday) {
-                        for (int i = 0; i < teamName1.size(); i++) {
-                            Game game = new Game(teamImage1.get(i), teamImage2.get(i), teamName1.get(i), teamName2.get(i), score1.get(i), score2.get(i));
-                            Log.e("sys", teamName1.get(i) + " " + score1.get(i) + " " + score2.get(i) + " " + teamName2.get(i));
-                            gamesArrayList.add(game);
-                        }
-                    } else {
-                        for (int i = 0; i < teamName1.size(); i++) {
-                            Game game = new Game(teamImage1.get(i), teamImage2.get(i), teamName1.get(i), teamName2.get(i), score1.get(i), score2.get(i));
-                            GameForDB gameForDB = new GameForDB(teamLogo1.get(i), teamLogo2.get(i), teamName1.get(i), teamName2.get(i), score1.get(i), score2.get(i));
-                            Log.e("sys", teamName1.get(i) + " " + score1.get(i) + " " + score2.get(i) + " " + teamName2.get(i));
-                            gamesArrayList.add(game);
-                            gamesForDBArrayList.add(gameForDB);
-                        }
-                        reference = db.getReference("game_days");
-                        for (int i = 0; i < gamesForDBArrayList.size(); i++) {
-                            reference.child(finalSelectedDateFormatted).child(String.valueOf(i)).setValue(gamesForDBArrayList.get(i)).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    Log.e("sys", "written succesfully");
-                                }
-                            });
-                        }
-                    }
-
-                }
-            }
-
-        });
-    }
-
-
-    public void getFromDB() {
-
-        ArrayList<String> teamName1 = new ArrayList<String>();
-        ArrayList<String> teamName2 = new ArrayList<String>();
-        ArrayList<Integer> score1 = new ArrayList<Integer>();
-        ArrayList<Integer> score2 = new ArrayList<Integer>();
-        ArrayList<Bitmap> teamImage1 = new ArrayList<Bitmap>();
-        ArrayList<Bitmap> teamImage2 = new ArrayList<Bitmap>();
-        ArrayList<String> teamLogo1 = new ArrayList<>();
-        ArrayList<String> teamLogo2 = new ArrayList<>();
-
-        reference = db.getReference("game_days/" + finalSelectedDateFormatted);
-
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Log.e("sys", snapshot.getValue().toString());
-                if (snapshot.getValue().toString().equals("none")) {
-                    noGames = true;
-                    Log.e("sys", "zaebis");
-                } else {
-                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        GameForDB gameForDB = dataSnapshot.getValue(GameForDB.class);
-                        teamName1.add(gameForDB.teamName1);
-                        teamName2.add(gameForDB.teamName2);
-                        score1.add(gameForDB.score1);
-                        score2.add(gameForDB.score2);
-                        Bitmap bitmap1;
-                        Bitmap bitmap2;
-                        InputStream inputStream1 = null;
-                        InputStream inputStream2 = null;
-                        try {
-                            inputStream1 = new java.net.URL(gameForDB.teamImage1).openStream();
-                            inputStream2 = new java.net.URL(gameForDB.teamImage2).openStream();
-                        } catch (Exception e) {
-                        }
-                        bitmap1 = BitmapFactory.decodeStream(inputStream1);
-                        bitmap2 = BitmapFactory.decodeStream(inputStream2);
-                        teamImage1.add(bitmap1);
-                        teamImage2.add(bitmap2);
-                    }
-                    for (int i = 0; i < teamName1.size(); i++) {
-                        Game game = new Game(teamImage1.get(i), teamImage2.get(i), teamName1.get(i), teamName2.get(i), score1.get(i), score2.get(i));
-                        Log.e("sys", game.teamName1 + " " + game.score1 + " " + game.score2 + " " + game.teamName2);
-                        gamesArrayList.add(game);
-                    }
-                }
-                Log.e("worked with db", "worked with db");
-
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
-
-    public void get() {
-
-        ArrayList<String> teamName1 = new ArrayList<String>();
-        ArrayList<String> teamName2 = new ArrayList<String>();
-        ArrayList<Integer> score1 = new ArrayList<Integer>();
-        ArrayList<Integer> score2 = new ArrayList<Integer>();
-        ArrayList<Bitmap> teamImage1 = new ArrayList<Bitmap>();
-        ArrayList<Bitmap> teamImage2 = new ArrayList<Bitmap>();
-        ArrayList<String> teamLogo1 = new ArrayList<>();
-        ArrayList<String> teamLogo2 = new ArrayList<>();
-
-        String[] arrOfStr = selectedDate.split("/");
-        String selectedDateFormatted = "";
-        for (int i = arrOfStr.length - 1; i > -1; i--) {
-            selectedDateFormatted += arrOfStr[i];
-        }
-        String finalSelectedDateFormatted = selectedDateFormatted;
-
-        reference = db.getReference("game_days");
-
-        reference.orderByKey().equalTo(finalSelectedDateFormatted).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Log.e("sys", String.valueOf(snapshot.exists()));
-                if (snapshot.exists()) {
-                    reference = db.getReference("game_days/" + finalSelectedDateFormatted);
-
-                    reference.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            Log.e("sys", snapshot.getValue().toString());
-                            if (snapshot.getValue().toString().equals("none")) {
-                                noGames = true;
-                                Log.e("sys", "zaebis");
-                            } else {
-                                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                                    GameForDB gameForDB = dataSnapshot.getValue(GameForDB.class);
-                                    teamName1.add(gameForDB.teamName1);
-                                    teamName2.add(gameForDB.teamName2);
-                                    score1.add(gameForDB.score1);
-                                    score2.add(gameForDB.score2);
-                                    Bitmap bitmap1;
-                                    Bitmap bitmap2;
-                                    InputStream inputStream1 = null;
-                                    InputStream inputStream2 = null;
-                                    try {
-                                        inputStream1 = new java.net.URL(gameForDB.teamImage1).openStream();
-                                        inputStream2 = new java.net.URL(gameForDB.teamImage2).openStream();
-                                    } catch (Exception e) {
-                                    }
-                                    bitmap1 = BitmapFactory.decodeStream(inputStream1);
-                                    bitmap2 = BitmapFactory.decodeStream(inputStream2);
-                                    teamImage1.add(bitmap1);
-                                    teamImage2.add(bitmap2);
-                                }
-                                for (int i = 0; i < teamName1.size(); i++) {
-                                    Game game = new Game(teamImage1.get(i), teamImage2.get(i), teamName1.get(i), teamName2.get(i), score1.get(i), score2.get(i));
-                                    Log.e("sys", game.teamName1 + " " + game.score1 + " " + game.score2 + " " + game.teamName2);
-                                    gamesArrayList.add(game);
-                                }
-                            }
-
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
-                    });
-
-                } else {
-                    String newUrl = "https://www.espn.com/nba/scoreboard/_/data/" + finalSelectedDateFormatted;
-
-                    Request request = new Request.Builder().url(newUrl).build();
-
-                    client.newCall(request).enqueue(new Callback() {
-                        @Override
-                        public void onFailure(@NonNull Call call, @NonNull IOException e) {
-
-                            e.printStackTrace();
-
-                        }
-
-                        @Override
-                        public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-
-                            String sb;
-                            try {
-                                sb = response.body().string();
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                            Pattern pattern = Pattern.compile("\\{\"id\":\"\\w+\",\"competitors\":\\[\\{\"id\":\"\\w+\",\"abbrev\":\"\\w+\",\"displayName\":\"[\\w\\s]+\",\"shortDisplayName\":\"[\\w\\s-]+\",\"logo\":\"[\\w/\\-.:]+\",\"teamColor\":\"\\w+\",\"altColor\":\"\\w+\",\"uid\":\"[\\w:~]+\",\"recordSummary\":\"\\w*+\",\"standingSummary\":\"\\w*+\",\"location\":\"[\\w\\s]+\",\"links\":\"[\\w/_.\\-]+\",\"isHome\":\\w+,\"score\":\\w+,[\"winner\":true,]*\"records\":\\[\\{\"name\":\"overall\",\"abbreviation\":\"\\w+\",\"type\":\"\\w+\",\"summary\":\"[\\w\\-]+\"\\},\\{\"name\":\"Home\",\"type\":\"home\",\"summary\":\"[\\w\\-]+\"\\}]\\},\\{\"id\":\"\\w+\",\"abbrev\":\"\\w+\",\"displayName\":\"[\\w\\s]+\",\"shortDisplayName\":\"[\\w\\s-]+\",\"logo\":\"[\\w/\\-.:]+\",\"teamColor\":\"\\w+\",\"altColor\":\"\\w+\",\"uid\":\"[\\w/.:~]+\",\"recordSummary\":\"\\w*+\",\"standingSummary\":\"\\w*+\",\"location\":\"[\\w\\s]+\",\"links\":\"[\\w/\\-]+\",\"isHome\":\\w+,\"score\":\\w+,[\"winner\":true,]*\"records\":\\[\\{\"name\":\"overall\",\"abbreviation\":\"\\w+\",\"type\":\"\\w+\",\"summary\":\"[\\w\\-]+\"\\},\\{\"name\":\"Road\",\"type\":\"road\",\"summary\":\"[\\w\\-]+\"\\}]\\}],\"date\":\"[\\w\\-:]+\"");
-                            Matcher matcher = pattern.matcher(sb);
-                            ArrayList<JSONObject> games_json_obj = new ArrayList<JSONObject>();
-                            while (matcher.find()) {
-                                try {
-                                    games_json_obj.add(new JSONObject(sb.substring(matcher.start(), matcher.end()).concat("}")));
-                                } catch (JSONException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            }
-                            if (games_json_obj.size() == 0) {
-                                noGames = true;
-                                Log.e("NOGAMES", String.valueOf(noGames));
-                                reference.child(finalSelectedDateFormatted).setValue("none").addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        Log.e("sys", "written succesfully");
-                                    }
-                                });
-                            } else {
-                                for (JSONObject jsonObject : games_json_obj) {
-                                    try {
-                                        JSONArray competitors = jsonObject.getJSONArray("competitors");
-                                        JSONObject team_json_1 = new JSONObject(competitors.get(0).toString());
-                                        JSONObject team_json_2 = new JSONObject(competitors.get(1).toString());
-                                        teamName1.add(team_json_1.getString("displayName"));
-                                        teamName2.add(team_json_2.getString("displayName"));
-                                        score1.add(team_json_1.getInt("score"));
-                                        score2.add(team_json_2.getInt("score"));
-                                        teamLogo1.add(team_json_1.getString("logo"));
-                                        teamLogo2.add(team_json_2.getString("logo"));
-                                        Bitmap bitmap1;
-                                        Bitmap bitmap2;
-                                        InputStream inputStream1 = null;
-                                        InputStream inputStream2 = null;
-                                        try {
-                                            inputStream1 = new java.net.URL(team_json_1.getString("logo")).openStream();
-                                            inputStream2 = new java.net.URL(team_json_2.getString("logo")).openStream();
-                                        } catch (Exception e) {
-                                        }
-
-                                        bitmap1 = BitmapFactory.decodeStream(inputStream1);
-                                        bitmap2 = BitmapFactory.decodeStream(inputStream2);
-                                        teamImage1.add(bitmap1);
-                                        teamImage2.add(bitmap2);
-                                    } catch (JSONException ex) {
-                                        throw new RuntimeException(ex);
-                                    }
-                                }
-                                for (int i = 0; i < teamName1.size(); i++) {
-                                    Game game = new Game(teamImage1.get(i), teamImage2.get(i), teamName1.get(i), teamName2.get(i), score1.get(i), score2.get(i));
-                                    GameForDB gameForDB = new GameForDB(teamLogo1.get(i), teamLogo2.get(i), teamName1.get(i), teamName2.get(i), score1.get(i), score2.get(i));
-                                    Log.e("sys", teamName1.get(i) + " " + score1.get(i) + " " + score2.get(i) + " " + teamName2.get(i));
-                                    gamesArrayList.add(game);
-                                    gamesForDBArrayList.add(gameForDB);
-                                }
-                                reference = db.getReference("game_days");
-                                for (int i = 0; i < gamesForDBArrayList.size(); i++) {
-                                    reference.child(finalSelectedDateFormatted).child(String.valueOf(i)).setValue(gamesForDBArrayList.get(i)).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            Log.e("sys", "written succesfully");
-                                        }
-                                    });
-                                }
-                            }
-                        }
-
-                    });
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
     }
 
 }
