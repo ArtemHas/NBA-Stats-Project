@@ -13,14 +13,12 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 
@@ -49,14 +47,10 @@ import org.json.JSONObject;
 
 
 import java.net.URL;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -71,12 +65,6 @@ import java.util.regex.Pattern;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import okhttp3.Call;
-import okhttp3.Callback;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 
 public class GameScoresFragment extends Fragment {
@@ -95,7 +83,7 @@ public class GameScoresFragment extends Fragment {
     DatabaseReference reference;
     private OnFragmentInteractionListener mListener;
     private RecyclerView recyclerView;
-    OkHttpClient client;
+
 
     public GameScoresFragment() {
 
@@ -122,7 +110,6 @@ public class GameScoresFragment extends Fragment {
 
         Log.e("selectedDate", selectedDate);
         db = FirebaseDatabase.getInstance();
-        client = new OkHttpClient();
         todayDate = selectedDate;
         String[] arrOfStr = todayDate.split("/");
         for (int i = arrOfStr.length - 1; i > -1; i--) {
