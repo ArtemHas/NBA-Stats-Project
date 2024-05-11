@@ -49,8 +49,14 @@ import org.json.JSONObject;
 
 
 import java.net.URL;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.chrono.ChronoLocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -111,7 +117,7 @@ public class GameScoresFragment extends Fragment {
                              Bundle savedInstanceState) {
         Date c = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        df.setTimeZone(TimeZone.getTimeZone("GMT-04:00"));
+        df.setTimeZone(TimeZone.getTimeZone("GMT-05:00"));
         selectedDate = df.format(c);
 
         Log.e("selectedDate", selectedDate);
@@ -126,7 +132,7 @@ public class GameScoresFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_game_scores, container, false);
         Button btnShowDatePicker = (Button) view.findViewById(R.id.btnShowDatePicker);
         btnShowDatePicker.setText(selectedDate);
-        final FragmentManager fm = ((AppCompatActivity) getActivity()).getSupportFragmentManager();
+        final FragmentManager fm = getParentFragmentManager();
         btnShowDatePicker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
@@ -442,6 +448,7 @@ public class GameScoresFragment extends Fragment {
                     @Override
                     public void run() {
                         Thread get_data = new Thread(new Runnable() {
+                            @RequiresApi(api = Build.VERSION_CODES.O)
                             @Override
                             public void run() {
                                 String newUrl = "https://www.espn.com/nba/scoreboard/_/data/" + finalSelectedDateFormatted;
@@ -457,7 +464,6 @@ public class GameScoresFragment extends Fragment {
                                         while (scanner.hasNext()) {
                                             sb.append(scanner.nextLine());
                                         }
-
                                         Pattern pattern = Pattern.compile("\\{\"id\":\"\\w+\",\"competitors\":\\[\\{\"id\":\"\\w+\",\"abbrev\":\"\\w+\",\"displayName\":\"[\\w\\s]+\",\"shortDisplayName\":\"[\\w\\s-]+\",\"logo\":\"[\\w/\\-.:]+\",\"teamColor\":\"\\w+\",\"altColor\":\"\\w+\",\"uid\":\"[\\w:~]+\",\"recordSummary\":\"\\w*+\",\"standingSummary\":\"\\w*+\",\"location\":\"[\\w\\s]+\",\"links\":\"[\\w/_.\\-]+\",\"isHome\":\\w+,\"score\":\\w+,[\"winner\":true,]*\"records\":\\[\\{\"name\":\"overall\",\"abbreviation\":\"\\w+\",\"type\":\"\\w+\",\"summary\":\"[\\w\\-]+\"\\},\\{\"name\":\"Home\",\"type\":\"home\",\"summary\":\"[\\w\\-]+\"\\}]\\},\\{\"id\":\"\\w+\",\"abbrev\":\"\\w+\",\"displayName\":\"[\\w\\s]+\",\"shortDisplayName\":\"[\\w\\s-]+\",\"logo\":\"[\\w/\\-.:]+\",\"teamColor\":\"\\w+\",\"altColor\":\"\\w+\",\"uid\":\"[\\w/.:~]+\",\"recordSummary\":\"\\w*+\",\"standingSummary\":\"\\w*+\",\"location\":\"[\\w\\s]+\",\"links\":\"[\\w/\\-]+\",\"isHome\":\\w+,\"score\":\\w+,[\"winner\":true,]*\"records\":\\[\\{\"name\":\"overall\",\"abbreviation\":\"\\w+\",\"type\":\"\\w+\",\"summary\":\"[\\w\\-]+\"\\},\\{\"name\":\"Road\",\"type\":\"road\",\"summary\":\"[\\w\\-]+\"\\}]\\}],\"date\":\"[\\w\\-:]+\"");
                                         Matcher matcher = pattern.matcher(sb);
                                         ArrayList<JSONObject> games_json_obj = new ArrayList<JSONObject>();
@@ -473,6 +479,7 @@ public class GameScoresFragment extends Fragment {
                                         }
                                         for (JSONObject jsonObject : games_json_obj) {
                                             try {
+                                                Log.e("sys", String.valueOf(jsonObject));
                                                 JSONArray competitors = jsonObject.getJSONArray("competitors");
                                                 JSONObject team_json_1 = new JSONObject(competitors.get(0).toString());
                                                 JSONObject team_json_2 = new JSONObject(competitors.get(1).toString());
@@ -496,9 +503,22 @@ public class GameScoresFragment extends Fragment {
                                                 bitmap2 = BitmapFactory.decodeStream(inputStream2);
                                                 teamImage1.add(bitmap1);
                                                 teamImage2.add(bitmap2);
+                                                //Log.e("sys" , String.valueOf(jsonObject.getString("date")));
+                                                DateTimeFormatter f = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm'Z'");
+                                                LocalDateTime time = LocalDateTime.parse(String.valueOf(jsonObject.getString("date")), f);
+                                                LocalDateTime approximateEndTime = time.plusHours(2).plusMinutes(45);
+                                                Log.e("sys", String.valueOf(approximateEndTime));
+
+                                                LocalDateTime now = LocalDateTime.now(ZoneOffset.ofHours(0));
+                                                DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+                                                String strCurrentTime = fmt.format(now);
+                                                LocalDateTime currentTimeFormatted = LocalDateTime.parse(strCurrentTime, fmt);
+                                                Log.e("currentTime", String.valueOf(currentTimeFormatted));
+                                                Log.e("isAfter", String.valueOf(currentTimeFormatted.isAfter(approximateEndTime)));
                                             } catch (JSONException ex) {
                                                 throw new RuntimeException(ex);
                                             }
+
                                         }
                                         for (int i = 0; i < teamName1.size(); i++) {
                                             Game game = new Game(teamImage1.get(i), teamImage2.get(i), teamName1.get(i), teamName2.get(i), score1.get(i), score2.get(i));

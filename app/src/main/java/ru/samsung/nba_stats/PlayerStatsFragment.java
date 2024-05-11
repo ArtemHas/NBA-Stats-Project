@@ -140,9 +140,16 @@ public class PlayerStatsFragment extends Fragment implements SelectListener {
 
     @Override
     public void onItemClicked(Team team) {
-        final FragmentManager fm = ((AppCompatActivity) getActivity()).getSupportFragmentManager();
+
+        final FragmentManager fm = getParentFragmentManager();
         FragmentTransaction fragmentTransaction = fm.beginTransaction();
-       // fragmentTransaction.replace(R.id.frame_layout, new GameScoresFragment());
-       // fragmentTransaction.commit();
+        Bundle result = new Bundle();
+        result.putString("URL", team.URL);
+        result.putString("teamName", team.teamName);
+        getParentFragmentManager().setFragmentResult("dataFromPlayerStatsFragment", result);
+        fragmentTransaction.hide(fm.findFragmentByTag("PlayerStatsFragmentTAG"));
+        fragmentTransaction.add(R.id.frame_layout, new TeamRosterFragment(), "TeamRosterFragmentTAG");
+        fragmentTransaction.commit();
+
     }
 }
