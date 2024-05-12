@@ -73,7 +73,6 @@ public class GameScoresFragment extends Fragment {
     String selectedDate;
     String todayDate;
     String todayDateFormatted = "";
-    Handler mainHandler = new Handler();
     public static final int REQUEST_CODE = 11;
     ArrayList<Game> gamesArrayList = new ArrayList<>();
     ArrayList<GameForDB> gamesForDBArrayList = new ArrayList<>();
@@ -141,8 +140,9 @@ public class GameScoresFragment extends Fragment {
             selectedDate = data.getStringExtra("selectedDate");
             Button button = (Button) getView().findViewById(R.id.btnShowDatePicker);
             button.setText(selectedDate);
+            noGames = false;
             gamesArrayList.clear();
-
+            gamesForDBArrayList.clear();
             ArrayList<String> teamName1 = new ArrayList<String>();
             ArrayList<String> teamName2 = new ArrayList<String>();
             ArrayList<Integer> score1 = new ArrayList<Integer>();
