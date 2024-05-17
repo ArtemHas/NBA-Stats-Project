@@ -23,22 +23,20 @@
                 android:id="@+id/player_stats_team_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
                 android:text="philadelphia 76ers"
-
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/player_stats_team_image"
+                app:layout_constraintStart_toEndOf="@+id/player_stats_team_image"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/player_stats_team_image"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
-                android:layout_marginLeft="20dp"
                 android:src="@drawable/dallas_maverics_logo"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/player_stats_team_name"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
