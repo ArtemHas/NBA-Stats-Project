@@ -2,11 +2,8 @@ package ru.samsung.nba_stats;
 
 import android.app.Activity;
 
-import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,11 +16,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import java.io.InputStream;
-
-
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,26 +23,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-
-
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
-
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -59,23 +36,22 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
-
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.net.ssl.HttpsURLConnection;
 
 
 public class GameScoresFragment extends Fragment {
     final String TAG = "tag";
+
+    Boolean connectionFailed = false;
     Boolean noGames = false;
     String selectedDate = "09/04/2024";
     String todayDate;
@@ -86,7 +62,7 @@ public class GameScoresFragment extends Fragment {
     ArrayList<String> loadedGamesSpinnerList = new ArrayList<>();
 
     String finalSelectedDateFormatted;
-    DatabaseReference reference;
+
     private OnFragmentInteractionListener mListener;
     private RecyclerView recyclerView;
 
@@ -151,10 +127,10 @@ public class GameScoresFragment extends Fragment {
             noGames = false;
             gamesArrayList.clear();
             gameRList.clear();
-            ArrayList<String> teamName1 = new ArrayList<String>();
-            ArrayList<String> teamName2 = new ArrayList<String>();
-            ArrayList<Integer> score1 = new ArrayList<Integer>();
-            ArrayList<Integer> score2 = new ArrayList<Integer>();
+            ArrayList<String> teamName1 = new ArrayList<>();
+            ArrayList<String> teamName2 = new ArrayList<>();
+            ArrayList<Integer> score1 = new ArrayList<>();
+            ArrayList<Integer> score2 = new ArrayList<>();
             ArrayList<String> teamImage1 = new ArrayList<>();
             ArrayList<String> teamImage2 = new ArrayList<>();
 
@@ -206,7 +182,8 @@ public class GameScoresFragment extends Fragment {
                                                     sb.append(scanner.nextLine());
                                                 }
 
-                                                Pattern pattern = Pattern.compile("\\{\"id\":\"\\w+\",\"competitors\":\\[\\{\"id\":\"\\w+\",\"abbrev\":\"\\w+\",\"displayName\":\"[\\w\\s]+\",\"shortDisplayName\":\"[\\w\\s-]+\",\"logo\":\"[\\w/\\-.:]+\",\"teamColor\":\"\\w+\",\"altColor\":\"\\w+\",\"uid\":\"[\\w:~]+\",\"recordSummary\":\"\\w*+\",\"standingSummary\":\"\\w*+\",\"location\":\"[\\w\\s]+\",\"links\":\"[\\w/_.\\-]+\",\"isHome\":\\w+,\"score\":\\w+,[\"winner\":true,]*\"records\":\\[\\{\"name\":\"overall\",\"abbreviation\":\"\\w+\",\"type\":\"\\w+\",\"summary\":\"[\\w\\-]+\"\\},\\{\"name\":\"Home\",\"type\":\"home\",\"summary\":\"[\\w\\-]+\"\\}]\\},\\{\"id\":\"\\w+\",\"abbrev\":\"\\w+\",\"displayName\":\"[\\w\\s]+\",\"shortDisplayName\":\"[\\w\\s-]+\",\"logo\":\"[\\w/\\-.:]+\",\"teamColor\":\"\\w+\",\"altColor\":\"\\w+\",\"uid\":\"[\\w/.:~]+\",\"recordSummary\":\"\\w*+\",\"standingSummary\":\"\\w*+\",\"location\":\"[\\w\\s]+\",\"links\":\"[\\w/\\-]+\",\"isHome\":\\w+,\"score\":\\w+,[\"winner\":true,]*\"records\":\\[\\{\"name\":\"overall\",\"abbreviation\":\"\\w+\",\"type\":\"\\w+\",\"summary\":\"[\\w\\-]+\"\\},\\{\"name\":\"Road\",\"type\":\"road\",\"summary\":\"[\\w\\-]+\"\\}]\\}],\"date\":\"[\\w\\-:]+\"");
+                                                Pattern pattern = Pattern
+                                                        .compile("\\{\"id\":\"\\w+\",\"competitors\":\\[\\{\"id\":\"\\w+\",\"abbrev\":\"\\w+\",\"displayName\":\"[\\w\\s]+\",\"shortDisplayName\":\"[\\w\\s-]+\",\"logo\":\"[\\w/\\-.:]+\",\"teamColor\":\"\\w+\",\"altColor\":\"\\w+\",\"uid\":\"[\\w:~]+\",\"recordSummary\":\"\\w*+\",\"standingSummary\":\"\\w*+\",\"location\":\"[\\w\\s]+\",\"links\":\"[\\w/_.\\-]+\",\"isHome\":\\w+,\"score\":\\w+,[\"winner\":true,]*\"records\":\\[\\{\"name\":\"overall\",\"abbreviation\":\"\\w+\",\"type\":\"\\w+\",\"summary\":\"[\\w\\-]+\"\\},\\{\"name\":\"Home\",\"type\":\"home\",\"summary\":\"[\\w\\-]+\"\\}]\\},\\{\"id\":\"\\w+\",\"abbrev\":\"\\w+\",\"displayName\":\"[\\w\\s]+\",\"shortDisplayName\":\"[\\w\\s-]+\",\"logo\":\"[\\w/\\-.:]+\",\"teamColor\":\"\\w+\",\"altColor\":\"\\w+\",\"uid\":\"[\\w/.:~]+\",\"recordSummary\":\"\\w*+\",\"standingSummary\":\"\\w*+\",\"location\":\"[\\w\\s]+\",\"links\":\"[\\w/\\-]+\",\"isHome\":\\w+,\"score\":\\w+,[\"winner\":true,]*\"records\":\\[\\{\"name\":\"overall\",\"abbreviation\":\"\\w+\",\"type\":\"\\w+\",\"summary\":\"[\\w\\-]+\"\\},\\{\"name\":\"Road\",\"type\":\"road\",\"summary\":\"[\\w\\-]+\"\\}]\\}],\"date\":\"[\\w\\-:]+\"");
                                                 Matcher matcher = pattern.matcher(sb);
                                                 ArrayList<JSONObject> games_json_obj = new ArrayList<JSONObject>();
                                                 while (matcher.find()) {
@@ -244,6 +221,7 @@ public class GameScoresFragment extends Fragment {
                                                                 , teamImage2.get(i), score1.get(i), score2.get(i), false);
                                                         gamesArrayList.add(game);
                                                         insertList.add(gameR);
+                                                        noGamesMessage.setText("");
                                                     }
                                                     if (!selected.equals(today)) {
                                                         loadedGamesSpinnerList.add(selectedDate);
@@ -311,7 +289,7 @@ public class GameScoresFragment extends Fragment {
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
         } else {
-            throw new RuntimeException(context.toString()
+            throw new RuntimeException(context
                     + " must implement OnFragmentInteractionListener");
         }
     }
@@ -331,7 +309,7 @@ public class GameScoresFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.e(TAG, "THIS RECREATES THE ONVIEWCREATED");
+        connectionFailed = false;
         LoadingDialog ld = new LoadingDialog(getActivity());
         ld.startLoadingAnimation();
         recyclerView = view.findViewById(R.id.gameScoresRecyclerView);
@@ -428,10 +406,10 @@ public class GameScoresFragment extends Fragment {
         spinner.setAdapter(spinnerAdapter);
 
 
-        ArrayList<String> teamName1 = new ArrayList<String>();
-        ArrayList<String> teamName2 = new ArrayList<String>();
-        ArrayList<Integer> score1 = new ArrayList<Integer>();
-        ArrayList<Integer> score2 = new ArrayList<Integer>();
+        ArrayList<String> teamName1 = new ArrayList<>();
+        ArrayList<String> teamName2 = new ArrayList<>();
+        ArrayList<Integer> score1 = new ArrayList<>();
+        ArrayList<Integer> score2 = new ArrayList<>();
         ArrayList<String> teamImage1 = new ArrayList<>();
         ArrayList<String> teamImage2 = new ArrayList<>();
 
@@ -514,8 +492,12 @@ public class GameScoresFragment extends Fragment {
                                             gamesArrayList.add(game);
                                         }
                                         ld.dismissDialog();
+                                    }else{
                                     }
                                 } catch (Exception e) {
+                                    connectionFailed = true;
+                                    ld.dismissDialog();
+                                    Log.e(TAG, "connection failed");
                                 }
                             }
                         });
@@ -525,6 +507,7 @@ public class GameScoresFragment extends Fragment {
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }
+
                         gameScoresAdapter.notifyDataSetChanged();
                         if (noGames) {
                             noGamesMessage.setText(R.string.no_games_today_yet_message);
@@ -533,6 +516,9 @@ public class GameScoresFragment extends Fragment {
                             noGamesMessage.setText("");
                         }
 
+                        if(connectionFailed){
+                            noGamesMessage.setText(R.string.internet_problems);
+                        }
                     }
 
                 });

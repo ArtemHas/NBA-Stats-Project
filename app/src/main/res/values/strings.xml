@@ -15,4 +15,8 @@
     <string name="incorrect_date_message">
         Incorrect date
     </string>
+    <string name="internet_problems">
+        Internet problems
+    </string>
+
 </resources>
