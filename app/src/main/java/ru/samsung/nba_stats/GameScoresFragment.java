@@ -362,7 +362,7 @@ public class GameScoresFragment extends Fragment {
                     }
 
                     finalSelectedDateFormatted = selectedDateFormatted;
-
+                    spinner.setSelection(0);
 
                     Thread getGamesFromSpinner = new Thread(new Runnable() {
                         @Override
