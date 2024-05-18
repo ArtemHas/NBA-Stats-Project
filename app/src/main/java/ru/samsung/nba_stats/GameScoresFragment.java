@@ -348,7 +348,7 @@ public class GameScoresFragment extends Fragment {
                 GameScoresAdapter gameScoresAdapter = new GameScoresAdapter(getContext(), gamesArrayList);
                 recyclerView.setAdapter(gameScoresAdapter);
                 String item = parent.getItemAtPosition(position).toString();
-                if (!item.equals("Select from loaded dates")) {
+                if (!(position == 0)) {
                     gameRList.clear();
                     gamesArrayList.clear();
                     Log.e(TAG, "SELECTED FROM LOADED DATES: " + item);
