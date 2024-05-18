@@ -2,6 +2,7 @@ package ru.samsung.nba_stats;
 
 import android.app.Activity;
 
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -27,9 +28,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 
 
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 
@@ -56,10 +61,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
 import java.util.Scanner;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -76,6 +83,7 @@ public class GameScoresFragment extends Fragment {
     public static final int REQUEST_CODE = 11;
     List<GameR> gameRList = new ArrayList<>();
     ArrayList<Game> gamesArrayList = new ArrayList<>();
+    ArrayList<String> loadedGamesSpinnerList = new ArrayList<>();
 
     String finalSelectedDateFormatted;
     DatabaseReference reference;
@@ -135,6 +143,8 @@ public class GameScoresFragment extends Fragment {
         if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             LoadingDialog ld = new LoadingDialog(getActivity());
             ld.startLoadingAnimation();
+            Spinner spinner = getActivity().findViewById(R.id.loadedGamesSpinner);
+            spinner.setSelection(0);
             selectedDate = data.getStringExtra("selectedDate");
             Button button = (Button) getView().findViewById(R.id.btnShowDatePicker);
             button.setText(selectedDate);
@@ -177,7 +187,7 @@ public class GameScoresFragment extends Fragment {
                                 @Override
                                 public void run() {
                                     gameRList = MyRoomDataBase.getInstance(getContext()).gameDao().loadAllByDate(finalSelectedDateFormatted);
-                                    if(gameRList.size() == 0){
+                                    if (gameRList.size() == 0) {
                                         Log.e(TAG, "getting from URL");
                                         List<GameR> insertList = new ArrayList<>();
 
@@ -234,17 +244,19 @@ public class GameScoresFragment extends Fragment {
                                                                 , teamImage2.get(i), score1.get(i), score2.get(i), false);
                                                         gamesArrayList.add(game);
                                                         insertList.add(gameR);
-                                                        Log.e(TAG, "ADDING TO ROOM");
                                                     }
-                                                    if (!selected.equals(today)){
+                                                    if (!selected.equals(today)) {
+                                                        loadedGamesSpinnerList.add(selectedDate);
+                                                        Log.e(TAG, "ADDING TO ROOM");
                                                         MyRoomDataBase.getInstance(getContext()).gameDao().insertMultipleGames(insertList);
                                                     }
                                                 } else {
                                                     if (noGames && selected.isBefore(today)) {
                                                         noGamesMessage.setText(R.string.no_games_message);
                                                         GameR nullGame = new GameR(finalSelectedDateFormatted, null, null, null, null, 0, 0, true);
-                                                        MyRoomDataBase.getInstance(getContext()).gameDao().insert(nullGame);
                                                         Log.e(TAG, "ADDING TO ROOM");
+                                                        MyRoomDataBase.getInstance(getContext()).gameDao().insert(nullGame);
+                                                        loadedGamesSpinnerList.add(selectedDate);
                                                     } else if (finalSelectedDateFormatted.equals(todayDateFormatted) && noGames) {
                                                         Log.e(TAG, "THIS IS TODAY DATE");
                                                         noGamesMessage.setText(R.string.no_games_today_yet_message);
@@ -256,10 +268,10 @@ public class GameScoresFragment extends Fragment {
                                             }
                                         } catch (Exception e) {
                                         }
-                                    }else{
+                                    } else {
                                         Log.e(TAG, "getting from ROOM");
                                         for (GameR gameR : gameRList) {
-                                            if (gameR.isNone){
+                                            if (gameR.isNone) {
                                                 noGamesMessage.setText(R.string.no_games_message);
                                                 Log.e(TAG, "ROOM SAYS THERE ARE NO GAMES");
                                                 break;
@@ -268,11 +280,9 @@ public class GameScoresFragment extends Fragment {
                                             Game game = new Game(gameR.teamImage1, gameR.teamImage2, gameR.teamName1, gameR.teamName2, gameR.score1, gameR.score2);
                                             gamesArrayList.add(game);
                                         }
-                                        Log.e(TAG, gamesArrayList.toString());
-
-                                        }
-                                        //gameScoresAdapter.notifyDataSetChanged();
                                     }
+                                    //gameScoresAdapter.notifyDataSetChanged();
+                                }
 
                             });
                             getData.start();
@@ -321,22 +331,109 @@ public class GameScoresFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        Log.e(TAG, "THIS RECREATES THE ONVIEWCREATED");
         LoadingDialog ld = new LoadingDialog(getActivity());
         ld.startLoadingAnimation();
+        recyclerView = view.findViewById(R.id.gameScoresRecyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        GameScoresAdapter gameScoresAdapter = new GameScoresAdapter(getContext(), gamesArrayList);
+        recyclerView.setAdapter(gameScoresAdapter);
+        TextView noGamesMessage = view.findViewById(R.id.noGamesMessage);
+        Spinner spinner = view.findViewById(R.id.loadedGamesSpinner);
+        Button button = (Button) getView().findViewById(R.id.btnShowDatePicker);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Log.e(TAG, "I HAVE RETURNED TO LISTENER");
+                GameScoresAdapter gameScoresAdapter = new GameScoresAdapter(getContext(), gamesArrayList);
+                recyclerView.setAdapter(gameScoresAdapter);
+                String item = parent.getItemAtPosition(position).toString();
+                if (!item.equals("Select from loaded dates")) {
+                    gameRList.clear();
+                    gamesArrayList.clear();
+                    Log.e(TAG, "SELECTED FROM LOADED DATES: " + item);
+                    button.setText(item);
+
+
+                    String[] arrOfStr = item.split("/");
+                    String selectedDateFormatted = "";
+                    for (int i = arrOfStr.length - 1; i > -1; i--) {
+                        selectedDateFormatted += arrOfStr[i];
+                    }
+
+                    finalSelectedDateFormatted = selectedDateFormatted;
+
+
+                    Thread getGamesFromSpinner = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            gameRList = MyRoomDataBase.getInstance(getContext()).gameDao().loadAllByDate(finalSelectedDateFormatted);
+                            Log.e(TAG, "getting from ROOM");
+                            for (GameR gameR : gameRList) {
+                                if (gameR.isNone) {
+                                    noGamesMessage.setText(R.string.no_games_message);
+                                    Log.e(TAG, "ROOM SAYS THERE ARE NO GAMES");
+                                    break;
+                                }
+                                noGamesMessage.setText("");
+                                Game game = new Game(gameR.teamImage1, gameR.teamImage2, gameR.teamName1, gameR.teamName2, gameR.score1, gameR.score2);
+                                gamesArrayList.add(game);
+                            }
+                        }
+                    });
+                    getGamesFromSpinner.start();
+                    try {
+                        getGamesFromSpinner.join();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    gameScoresAdapter.notifyDataSetChanged();
+
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        loadedGamesSpinnerList.add(0, "Select from loaded dates");
+        Thread loadedGames = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<GameR> loadedGames = MyRoomDataBase.getInstance(getContext()).gameDao().getAll();
+                ArrayList<String> t = new ArrayList<>();
+                for (GameR loadedGame : loadedGames) {
+                    t.add(loadedGame.date);
+                }
+                Set<String> loadedGamesDates = new HashSet<>(t);
+                for (String date : loadedGamesDates) {
+                    String year = date.substring(0, 4);
+                    String month = date.substring(4, 6);
+                    String day = date.substring(6, 8);
+                    loadedGamesSpinnerList.add(day + "/" + month + "/" + year);
+                }
+            }
+        });
+        loadedGames.start();
+        try {
+            loadedGames.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        Log.e(TAG, String.valueOf(loadedGamesSpinnerList));
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, loadedGamesSpinnerList);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.select_dialog_singlechoice);
+        spinner.setAdapter(spinnerAdapter);
+
+
         ArrayList<String> teamName1 = new ArrayList<String>();
         ArrayList<String> teamName2 = new ArrayList<String>();
         ArrayList<Integer> score1 = new ArrayList<Integer>();
         ArrayList<Integer> score2 = new ArrayList<Integer>();
         ArrayList<String> teamImage1 = new ArrayList<>();
         ArrayList<String> teamImage2 = new ArrayList<>();
-
-
-        recyclerView = view.findViewById(R.id.gameScoresRecyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        GameScoresAdapter gameScoresAdapter = new GameScoresAdapter(getContext(), gamesArrayList);
-        recyclerView.setAdapter(gameScoresAdapter);
-        TextView noGamesMessage = view.findViewById(R.id.noGamesMessage);
 
 
         String[] arrOfStr = selectedDate.split("/");
@@ -416,7 +513,7 @@ public class GameScoresFragment extends Fragment {
                                             Game game = new Game(teamImage1.get(i), teamImage2.get(i), teamName1.get(i), teamName2.get(i), score1.get(i), score2.get(i));
                                             gamesArrayList.add(game);
                                         }
-
+                                        ld.dismissDialog();
                                     }
                                 } catch (Exception e) {
                                 }
@@ -435,14 +532,12 @@ public class GameScoresFragment extends Fragment {
                         } else {
                             noGamesMessage.setText("");
                         }
-                        ld.dismissDialog();
 
                     }
 
                 });
             }
         }).start();
-
 
     }
 

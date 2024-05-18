@@ -128,7 +128,6 @@ public class PlayerStatsFragment extends Fragment implements SelectListener {
                         ld.dismissDialog();
                     }
                 }, 3000);
-
             }
         }).start();
     }
