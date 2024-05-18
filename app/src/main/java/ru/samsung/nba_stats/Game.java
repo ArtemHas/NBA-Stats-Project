@@ -3,7 +3,7 @@ package ru.samsung.nba_stats;
 import android.graphics.Bitmap;
 
 public class Game {
-    public Game(Bitmap teamImage1, Bitmap teamImage2, String teamName1, String teamName2, Integer score1, Integer score2) {
+    public Game(String teamImage1, String teamImage2, String teamName1, String teamName2, Integer score1, Integer score2) {
         this.teamImage1 = teamImage1;
         this.teamImage2 = teamImage2;
         this.teamName1 = teamName1;
@@ -12,7 +12,7 @@ public class Game {
         this.score2 = score2;
     }
 
-    Bitmap teamImage1,teamImage2;
+    String teamImage1,teamImage2;
     String teamName1,teamName2;
     Integer score1,score2;
 }

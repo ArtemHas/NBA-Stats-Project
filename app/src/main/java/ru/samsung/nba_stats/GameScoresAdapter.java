@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.ArrayList;
@@ -29,25 +30,18 @@ public class GameScoresAdapter extends RecyclerView.Adapter<GameScoresAdapter.My
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(context).inflate(R.layout.list_item,parent,false);
-
         return new MyViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         Game game = gamesArrayList.get(position);
-
-        /*new FetchImage(game.teamImage1, game.teamImage2, holder).start();*/
-
+        Glide.with(context).load(game.teamImage1).into(holder.teamImage1);
+        Glide.with(context).load(game.teamImage2).into(holder.teamImage2);
         holder.teamName1.setText(String.valueOf(game.teamName1));
         holder.teamName2.setText(String.valueOf(game.teamName2));
         holder.score1.setText(String.valueOf(game.score1));
         holder.score2.setText(String.valueOf(game.score2));
-        holder.teamImage1.setImageBitmap(game.teamImage1);
-        holder.teamImage2.setImageBitmap(game.teamImage2);
-       /* holder.teamImage1.setImageResource(game.teamImage1);
-        holder.teamName1.setText(game.teamName1);
-        ЗДЕСЬ УЖЕ ГОТОВОЕ ВСЕ ЗАКИНУТЬ*/
     }
 
     @Override
@@ -69,51 +63,4 @@ public class GameScoresAdapter extends RecyclerView.Adapter<GameScoresAdapter.My
             score2 = itemView.findViewById(R.id.score2);
         }
     }
-/*    class FetchImage extends Thread{
-        String URL1;
-        String URL2;
-        GameScoresAdapter.MyViewHolder holder;
-        Bitmap bitmap1;
-        Bitmap bitmap2;
-        FetchImage(String URL1, String URL2, GameScoresAdapter.MyViewHolder holder){
-            this.URL1 = URL1;
-            this.URL2 = URL2;
-            this.holder = holder;
-        }
-
-        @Override
-        public void run() {
-            mainHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    progressDialog = new ProgressDialog(context);
-                    progressDialog.setMessage("Getting your games data");
-                    progressDialog.setCancelable(false);
-                    progressDialog.show();
-                }
-            });
-
-            InputStream inputStream = null;
-            try {
-                inputStream = new java.net.URL(URL1).openStream();
-                bitmap1 = BitmapFactory.decodeStream(inputStream);
-                inputStream = new java.net.URL(URL2).openStream();
-                bitmap2 = BitmapFactory.decodeStream(inputStream);
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            mainHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (progressDialog.isShowing()){
-                        progressDialog.dismiss();
-                        holder.teamImage1.setImageBitmap(bitmap1);
-                        holder.teamImage2.setImageBitmap(bitmap2);
-                    }
-                }
-            });
-
-        }
-    }*/
 }
