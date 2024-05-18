@@ -133,6 +133,8 @@ public class GameScoresFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            LoadingDialog ld = new LoadingDialog(getActivity());
+            ld.startLoadingAnimation();
             selectedDate = data.getStringExtra("selectedDate");
             Button button = (Button) getView().findViewById(R.id.btnShowDatePicker);
             button.setText(selectedDate);
@@ -280,7 +282,7 @@ public class GameScoresFragment extends Fragment {
                                 throw new RuntimeException(e);
                             }
                             gameScoresAdapter.notifyDataSetChanged();
-
+                            ld.dismissDialog();
 
 
                         }
