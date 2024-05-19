@@ -33,14 +33,16 @@ import com.google.firebase.storage.StorageReference;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class PlayerStatsFragment extends Fragment implements SelectListener {
-    StorageReference storageReference;
+    final String TAG = "tag";
     DatabaseReference reference;
     Handler handler;
     FirebaseDatabase db;
     RecyclerView recyclerView;
     ArrayList<Team> teamsArrayList = new ArrayList<>();
+    List<Team> insertList = new ArrayList<>();
 
     public PlayerStatsFragment() {
 
@@ -82,52 +84,66 @@ public class PlayerStatsFragment extends Fragment implements SelectListener {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        reference = db.getReference("urls");
-                        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        Thread getData = new Thread(new Runnable() {
                             @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                                    String imageID = dataSnapshot.getKey();
-                                    storageReference = FirebaseStorage.getInstance().getReference("team_logos/" + imageID + ".png");
-                                    try {
-                                        File localfile = File.createTempFile("tempfile", ".png");
-                                        storageReference.getFile(localfile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                                            @Override
-                                            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                                Bitmap bitmap = BitmapFactory.decodeFile(localfile.getAbsolutePath());
+                            public void run() {
+                                List<Team> roomTeamsList = MyRoomTeamsDataBase.getInstance(getContext()).teamsDao().getAllTeams();
+                                if (roomTeamsList.size() == 0){
+                                    Log.e(TAG, "GETTING FROM FIREBASE");
+                                    reference = db.getReference("urls");
+                                    reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                                 String[] arrOfStr = dataSnapshot.getKey().split("-");
                                                 String teamNameFormatted = arrOfStr[0] + " " + arrOfStr[1];
-                                                Team team = new Team(bitmap, teamNameFormatted, dataSnapshot.getValue().toString());
+                                                String logo = "";
+                                                String url = "";
+                                                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                                                    if(child.getKey().equals("logo")){
+                                                        logo = String.valueOf(child.getValue());
+                                                    }else{
+                                                        url = String.valueOf(child.getValue());
+                                                    }
+                                                }
+                                                Team team = new Team(logo, teamNameFormatted, url);
                                                 teamsArrayList.add(team);
-                                                teamListAdapter.notifyDataSetChanged();
+                                                insertList.add(team);
                                             }
-                                        }).addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
+                                            new Thread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    Log.e(TAG, "STORING");
+                                                    MyRoomTeamsDataBase.getInstance(getContext()).teamsDao().insertMultipleTeams(insertList);
+                                                    ld.dismissDialog();
+                                                }
+                                            }).start();
+                                            teamListAdapter.notifyDataSetChanged();
+                                        }
 
-                                            }
-                                        });
-                                    } catch (IOException e) {
-                                        throw new RuntimeException(e);
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
+                                }else{
+                                    Log.e(TAG, "GETTING FROM ROOM");
+                                    for (Team team : roomTeamsList) {
+                                        teamsArrayList.add(team);
                                     }
+                                    ld.dismissDialog();
                                 }
-
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
                             }
                         });
-
+                        getData.start();
+                        try {
+                            getData.join();
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                        teamListAdapter.notifyDataSetChanged();
                     }
                 });
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        ld.dismissDialog();
-                    }
-                }, 3000);
             }
         }).start();
     }
@@ -152,3 +168,4 @@ public class PlayerStatsFragment extends Fragment implements SelectListener {
 
     }
 }
+

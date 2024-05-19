@@ -1,40 +1,28 @@
 package ru.samsung.nba_stats;
 
-import android.graphics.Bitmap;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
+@Entity
 public class Team {
-    Bitmap teamImage;
-    String teamName, URL;
-    public Team(Bitmap teamImage,String teamName, String URL) {
+    @PrimaryKey(autoGenerate = true)
+     public int uid;
+    @ColumnInfo(name = "team_image")
+    String teamImage;
+    @ColumnInfo(name = "team_name")
+    String teamName;
+    @ColumnInfo (name = "url")
+    String URL;
+    public Team(){
+
+    }
+    public Team(String teamImage,String teamName, String URL) {
         this.teamImage = teamImage;
         this.teamName = teamName;
         this.URL = URL;
     }
-    public Team(){}
 
-    public Bitmap getTeamImage() {
-        return teamImage;
-    }
-
-    public String getTeamName() {
-        return teamName;
-    }
-
-    public String getURL() {
-        return URL;
-    }
-
-    public void setTeamImage(Bitmap teamImage) {
-        this.teamImage = teamImage;
-    }
-
-    public void setTeamName(String teamName) {
-        this.teamName = teamName;
-    }
-
-    public void setURL(String URL) {
-        this.URL = URL;
-    }
 
 
 

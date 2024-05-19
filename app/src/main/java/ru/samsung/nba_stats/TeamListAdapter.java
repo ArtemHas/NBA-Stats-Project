@@ -12,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.ArrayList;
 
 public class TeamListAdapter extends RecyclerView.Adapter<TeamListAdapter.MyViewHolder>{
@@ -39,7 +41,7 @@ public class TeamListAdapter extends RecyclerView.Adapter<TeamListAdapter.MyView
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         Team team = teamsArrayList.get(position);
-        holder.teamImage.setImageBitmap(team.teamImage);
+        Glide.with(context).load(team.teamImage).into(holder.teamImage);
         holder.teamName.setText(team.teamName);
 
         holder.cardView.setOnClickListener(new View.OnClickListener() {
