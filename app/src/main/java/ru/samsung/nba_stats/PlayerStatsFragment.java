@@ -162,9 +162,9 @@ public class PlayerStatsFragment extends Fragment implements SelectListener {
         result.putString("URL", team.URL);
         result.putString("teamName", team.teamName);
         getParentFragmentManager().setFragmentResult("dataFromPlayerStatsFragment", result);
-        fragmentTransaction.hide(fm.findFragmentByTag("PlayerStatsFragmentTAG"));
-        fragmentTransaction.add(R.id.frame_layout, new TeamRosterFragment(), "TeamRosterFragmentTAG");
+        fragmentTransaction.replace(R.id.frame_layout, new TeamRosterFragment(), "TeamRosterFragmentTAG");
         fragmentTransaction.commit();
+
 
     }
 }
