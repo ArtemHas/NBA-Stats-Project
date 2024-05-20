@@ -433,6 +433,9 @@ public class GameScoresFragment extends Fragment {
                             @RequiresApi(api = Build.VERSION_CODES.O)
                             @Override
                             public void run() {
+
+                                MyRoomPlayerInRosterDataBase.getInstance(getContext()).playerInRosterDao().nukeTable();
+
                                 String newUrl = "https://www.espn.com/nba/scoreboard/_/data/" + finalSelectedDateFormatted;
                                 try {
                                     URL urlObj = new URL(newUrl);
