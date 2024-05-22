@@ -1,6 +1,7 @@
 package ru.samsung.nba_stats;
 // PlayerListAdapter
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import java.util.ArrayList;
@@ -16,8 +18,9 @@ public class PlayerListAdapter extends RecyclerView.Adapter<PlayerListAdapter.My
     Context context;
 
     ArrayList<PlayerInRoster> playersArrayList;
-    public PlayerListAdapter(Context context, ArrayList<PlayerInRoster> playersArrayList) {
-
+    private SelectListenerRoster listener;
+    public PlayerListAdapter(Context context, ArrayList<PlayerInRoster> playersArrayList, SelectListenerRoster listener) {
+        this.listener = listener;
         this.context = context;
         this.playersArrayList = playersArrayList;
 
@@ -32,10 +35,17 @@ public class PlayerListAdapter extends RecyclerView.Adapter<PlayerListAdapter.My
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MyViewHolder holder, @SuppressLint("RecyclerView") int position) {
         PlayerInRoster player = playersArrayList.get(position);
         Glide.with(context).load(player.playerHeadshot).into(holder.playerImage);
         holder.playerName.setText(player.playerName);
+        holder.cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onItemClicked(player);
+            }
+        });
+
     }
 
     @Override
@@ -46,9 +56,10 @@ public class PlayerListAdapter extends RecyclerView.Adapter<PlayerListAdapter.My
     public static class MyViewHolder extends RecyclerView.ViewHolder{
         ImageView playerImage;
         TextView playerName;
-
+        CardView cardView;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
+            cardView = itemView.findViewById(R.id.roster_container);
             playerImage = itemView.findViewById(R.id.roster_player_image);
             playerName = itemView.findViewById(R.id.roster_player_name);
         }

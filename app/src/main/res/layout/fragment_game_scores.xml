@@ -37,18 +37,24 @@
             app:layout_constraintStart_toStartOf="parent"/>
 
         <Button
-
             android:id="@+id/btnShowDatePicker"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:text="show date"
 
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnClearLoadedGames"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/loadedGamesSpinner"/>
-
+        <Button
+            android:id="@+id/btnClearLoadedGames"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/btnShowDatePicker"
+            app:layout_constraintTop_toTopOf="parent"
+            android:text="Clear loaded games"/>
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/gameScoresRecyclerView"
             android:layout_width="match_parent"

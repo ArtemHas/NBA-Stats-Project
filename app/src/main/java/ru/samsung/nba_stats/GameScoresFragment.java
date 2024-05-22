@@ -99,6 +99,7 @@ public class GameScoresFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_game_scores, container, false);
         Button btnShowDatePicker = (Button) view.findViewById(R.id.btnShowDatePicker);
+        Button btnClearLoadedGames = (Button) view.findViewById(R.id.btnClearLoadedGames);
         btnShowDatePicker.setText(selectedDate);
         final FragmentManager fm = getParentFragmentManager();
         btnShowDatePicker.setOnClickListener(new View.OnClickListener() {
@@ -107,6 +108,19 @@ public class GameScoresFragment extends Fragment {
                 AppCompatDialogFragment newFragment = new DatePickerFragment();
                 newFragment.setTargetFragment(GameScoresFragment.this, REQUEST_CODE);
                 newFragment.show(fm, "datePicker");
+            }
+        });
+        btnClearLoadedGames.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        MyRoomDataBase.getInstance(getContext()).gameDao().nukeTable();
+                        loadedGamesSpinnerList.clear();
+                        loadedGamesSpinnerList.add(0, "Select from loaded dates");
+                    }
+                }).start();
             }
         });
 

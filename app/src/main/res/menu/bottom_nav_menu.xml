@@ -6,7 +6,7 @@
         android:icon="@drawable/games_stats_24"
         android:id="@+id/game_scores"/>
     <item
-        android:title="player stats"
+        android:title="team rosters"
         android:icon="@drawable/teams_and_players_24"
         android:id="@+id/player_stats"/>
 </menu>

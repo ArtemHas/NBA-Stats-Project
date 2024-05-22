@@ -14,19 +14,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URL;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -36,7 +33,7 @@ import java.util.regex.Pattern;
 import javax.net.ssl.HttpsURLConnection;
 
 
-public class TeamRosterFragment extends Fragment {
+public class TeamRosterFragment extends Fragment implements SelectListenerRoster{
     final String TAG = "tag";
     private RecyclerView recyclerView;
     String URL;
@@ -63,11 +60,22 @@ public class TeamRosterFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_team_roster, container, false);
         Button button = (Button) view.findViewById(R.id.buttonGoBack);
+        TextView teamTextView = view.findViewById(R.id.teamNameRoster);
+
+        getParentFragmentManager().setFragmentResultListener("dataFromPlayerPageFragment", this, new FragmentResultListener() {
+            @Override
+            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                teamName = result.getString("teamName");
+                URL = result.getString("URL");
+                teamTextView.setText(teamName);
+            }
+        });
         getParentFragmentManager().setFragmentResultListener("dataFromPlayerStatsFragment", this, new FragmentResultListener() {
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
                 teamName = result.getString("teamName");
                 URL = result.getString("URL");
+                teamTextView.setText(teamName);
             }
         });
         button.setOnClickListener(new View.OnClickListener() {
@@ -101,7 +109,7 @@ public class TeamRosterFragment extends Fragment {
 
         recyclerView = getActivity().findViewById(R.id.teamRosterRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        PlayerListAdapter playerListAdapter = new PlayerListAdapter(getContext(), playersArrayList);
+        PlayerListAdapter playerListAdapter = new PlayerListAdapter(getContext(), playersArrayList, this);
         recyclerView.setAdapter(playerListAdapter);
 
         new Thread(new Runnable() {
@@ -213,5 +221,10 @@ public class TeamRosterFragment extends Fragment {
                 });
             }
         }).start();
+    }
+
+    @Override
+    public void onItemClicked(PlayerInRoster playerInRoster) {
+
     }
 }
