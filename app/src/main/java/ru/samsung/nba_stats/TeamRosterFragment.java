@@ -38,7 +38,7 @@ public class TeamRosterFragment extends Fragment implements SelectListenerRoster
     private RecyclerView recyclerView;
     String URL;
     String teamName;
-    ArrayList<PlayerInRoster> playersArrayList = new ArrayList<>();
+    ArrayList<PlayerInRosterForRecyclerView> playersArrayList = new ArrayList<>();
     List<PlayerInRoster> playersFromRoom = new ArrayList<>();
 
     public TeamRosterFragment() {
@@ -187,8 +187,16 @@ public class TeamRosterFragment extends Fragment implements SelectListenerRoster
                                                         playerPosition.get(i),playerHeight.get(i),
                                                         URL
                                                 );
+                                                PlayerInRosterForRecyclerView playerInRosterForRecyclerView = new PlayerInRosterForRecyclerView(
+                                                        playerName.get(i),playerBirthDate.get(i),
+                                                        playerAge.get(i),playerSalary.get(i),
+                                                        playerExperience.get(i), playerJersey.get(i),
+                                                        playerHeadshot.get(i),playerURL.get(i),
+                                                        playerPosition.get(i),playerHeight.get(i),
+                                                        URL
+                                                );
                                                 insertList.add(playerInRoster);
-                                                playersArrayList.add(playerInRoster);
+                                                playersArrayList.add(playerInRosterForRecyclerView);
                                             }
                                         }
                                     } catch (Exception e) {}
@@ -202,7 +210,15 @@ public class TeamRosterFragment extends Fragment implements SelectListenerRoster
                                 } else {
                                     Log.e(TAG, "getting from ROOM");
                                     for (PlayerInRoster playerInRoster : playersFromRoom) {
-                                        playersArrayList.add(playerInRoster);
+                                        PlayerInRosterForRecyclerView playerInRosterForRecyclerView= new PlayerInRosterForRecyclerView(
+                                                playerInRoster.playerName, playerInRoster.playerBirthDate,
+                                                playerInRoster.age, playerInRoster.playerSalary,
+                                                playerInRoster.playerExperience, playerInRoster.playerJersey,
+                                                playerInRoster.playerHeadshot, playerInRoster.playerURL,
+                                                playerInRoster.playerPosition, playerInRoster.playerHeight,
+                                                playerInRoster.rosterURL
+                                        );
+                                        playersArrayList.add(playerInRosterForRecyclerView);
                                     }
                                 }
                             }
@@ -224,7 +240,15 @@ public class TeamRosterFragment extends Fragment implements SelectListenerRoster
     }
 
     @Override
-    public void onItemClicked(PlayerInRoster playerInRoster) {
-
+    public void onItemClicked(PlayerInRosterForRecyclerView playerInRosterForRecyclerView) {
+        final FragmentManager fm = getParentFragmentManager();
+        FragmentTransaction fragmentTransaction = fm.beginTransaction();
+        Bundle result = new Bundle();
+        result.putString("teamURL", URL);
+        result.putString("teamName", teamName);
+        result.putString("playerURL", playerInRosterForRecyclerView.playerURL);
+        getParentFragmentManager().setFragmentResult("dataFromTeamRosterFragment", result);
+        fragmentTransaction.replace(R.id.frame_layout, new PlayerPageFragment(), "PlayerPageFragmentTAG");
+        fragmentTransaction.commit();
     }
 }

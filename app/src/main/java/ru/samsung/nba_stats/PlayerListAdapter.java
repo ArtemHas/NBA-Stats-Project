@@ -17,9 +17,9 @@ import java.util.ArrayList;
 public class PlayerListAdapter extends RecyclerView.Adapter<PlayerListAdapter.MyViewHolder>{
     Context context;
 
-    ArrayList<PlayerInRoster> playersArrayList;
+    ArrayList<PlayerInRosterForRecyclerView> playersArrayList;
     private SelectListenerRoster listener;
-    public PlayerListAdapter(Context context, ArrayList<PlayerInRoster> playersArrayList, SelectListenerRoster listener) {
+    public PlayerListAdapter(Context context, ArrayList<PlayerInRosterForRecyclerView> playersArrayList, SelectListenerRoster listener) {
         this.listener = listener;
         this.context = context;
         this.playersArrayList = playersArrayList;
@@ -36,7 +36,7 @@ public class PlayerListAdapter extends RecyclerView.Adapter<PlayerListAdapter.My
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, @SuppressLint("RecyclerView") int position) {
-        PlayerInRoster player = playersArrayList.get(position);
+        PlayerInRosterForRecyclerView player = playersArrayList.get(position);
         Glide.with(context).load(player.playerHeadshot).into(holder.playerImage);
         holder.playerName.setText(player.playerName);
         holder.cardView.setOnClickListener(new View.OnClickListener() {

@@ -4,4 +4,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="main_page_background"> </color>
     <color name="underline">#D8D6D6</color>
+    <color name="yellow">#FFFF99</color>
 </resources>
