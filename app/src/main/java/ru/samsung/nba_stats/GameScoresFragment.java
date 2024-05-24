@@ -488,17 +488,6 @@ public class GameScoresFragment extends Fragment {
                                                 teamImage1.add(team_json_1.getString("logo"));
                                                 teamImage2.add(team_json_2.getString("logo"));
 
-                                                //Log.e("sys" , String.valueOf(jsonObject.getString("date")));
-                                                DateTimeFormatter f = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm'Z'");
-                                                LocalDateTime time = LocalDateTime.parse(String.valueOf(jsonObject.getString("date")), f);
-                                                LocalDateTime approximateEndTime = time.plusHours(2).plusMinutes(45);
-
-                                                LocalDateTime now = LocalDateTime.now(ZoneOffset.ofHours(0));
-                                                DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-                                                String strCurrentTime = fmt.format(now);
-                                                LocalDateTime currentTimeFormatted = LocalDateTime.parse(strCurrentTime, fmt);
-                                                //Log.e("currentTime", String.valueOf(currentTimeFormatted));
-                                                //Log.e("isAfter", String.valueOf(currentTimeFormatted.isAfter(approximateEndTime)));
                                             } catch (JSONException ex) {
                                                 throw new RuntimeException(ex);
                                             }
